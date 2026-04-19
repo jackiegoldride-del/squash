@@ -32,7 +32,7 @@ const LANGS = {
     setMaint:"🔧 סמן תחזוקה", clearMaint:"✓ בטל תחזוקה",
     editBook:"✏️ ערוך הזמנה", cancelBook:"ביטול הזמנה",
     closeModal:"סגור", password:"סיסמה", enter:"כניסה",
-    wrongPwd:"❌ 'סיסמה שגויה"
+    wrongPwd:"❌ 'סיסמה שגויה",
     codeLabel:"קוד אישי", codeMsg:"שמור את הקוד — הוא מאפשר לראות את ההזמנות שלך",
     closedMsg:"המועדון סגור", noBookings:"אין הזמנות",
     noPhone:"לא נמצאו הזמנות למספר זה",
