@@ -341,7 +341,7 @@ const DetailModal = ({t,court,slot,booking,isAdmin,canDel,onDelete,onEdit,onClos
       </div>
       {isAdmin&&<PBtn onClick={onEdit} bg={G.goldBg} tc={G.goldL} mb="10px" style={{border:`1px solid ${G.goldBorder}`}}>{t.editBook}</PBtn>}
       {canDel
-        ? <PBtn onClick={onDelete} bg="#dc2626" tc="white">{isAdmin?t.cancelBook+" ↩":t.cancelBook}</PBtn>
+        ? isAdmin&&<PBtn onClick={onDelete} bg="#dc2626" tc="white">{isAdmin?t.cancelBook+" ↩":t.cancelBook}</PBtn>
         : !isAdmin&&<div style={{color:"#c02020",fontSize:"13px",textAlign:"center",marginBottom:"10px",padding:"10px",background:"#fef0f0",border:"1px solid #f5c0c0",borderRadius:"8px",fontWeight:"600"}}>{t.cancelInfo}</div>
       }
       <GhB onClick={onClose}>{t.closeModal}</GhB>
