@@ -1,122 +1,68 @@
-# 🎾 קאנטרי נווה שרת — אפליקציית סקווש
-## מדריך פריסה מלא — Supabase + Vercel
+# 🎾 SQUASH MATCH
 
----
+אפליקציית התאמת שותפים לסקווש — React + Vite + Supabase.
+A bilingual (Hebrew/English) squash partner-matching app with a USR-style rating system.
 
-## שלב 1 — הכנת מסד הנתונים (Supabase)
+## Features
 
-### 1.1 צור חשבון Supabase
-1. כנס ל: https://supabase.com
-2. לחץ **Start your project** → התחבר עם GitHub
-3. לחץ **New Project**
-   - Name: `neve-sharet-squash`
-   - Password: בחר סיסמה חזקה (שמור אותה!)
-   - Region: **Israel (eu-west-1)** או **West EU**
-4. המתן ~2 דקות עד שהפרויקט מוכן
+- **Rating quiz** — 11 questions (first = gender, not scored; 10 skill questions scored 1–5) mapping to a USR rating of 2.0–5.5
+- **Partner matching** — players within ±0.5 rating, with gender filter and WhatsApp coordination
+- **Dual-confirmed results** — win/loss reports only take effect after the opponent confirms
+- **Rating protection** — max 1 rated game per week vs the same opponent; ratings only move after 3+ unique opponents
+- **ELO-style updates** — ±0.1 to ±0.3 per game (bigger swings for upsets); precise internal rating, 0.5-step display
+- **10 achievement badges**, head-to-head screen, personal stats with rating history chart, endless leaderboard (no medals)
+- **Admin panel** — player database by level with phone numbers and wa.me links, broadcast/level/private messages, force-approve or delete pending results, delete players
+- Dark theme with cyan–purple gradients, full RTL support
 
-### 1.2 צור את הטבלאות
-1. בתפריט שמאל → לחץ **SQL Editor**
-2. לחץ **New Query**
-3. פתח את הקובץ `supabase_schema.sql` מהתיקייה
-4. העתק את כל התוכן והדבק בחלון
-5. לחץ **Run** (Ctrl+Enter)
-6. אמור לראות: "Success. No rows returned"
+The app runs in **demo mode** (browser localStorage) until Supabase env vars are set, so you can try it immediately with `npm run dev`.
 
-### 1.3 קבל את מפתחות ה-API
-1. בתפריט שמאל → **Settings** → **API**
-2. העתק את:
-   - **Project URL** (נראה כך: `https://abcdefgh.supabase.co`)
-   - **anon public** key (מחרוזת ארוכה שמתחילה ב-`eyJ...`)
-3. שמור אותם — תצטרכי אותם בשלב 3
+## Local development
 
----
-
-## שלב 2 — העלאה ל-GitHub
-
-### 2.1 צור חשבון GitHub (אם אין)
-1. כנסי ל: https://github.com
-2. לחצי **Sign up** → מייל + סיסמה + שם משתמש
-
-### 2.2 צור Repository חדש
-1. לחצי על **+** (פינה ימנית עליונה) → **New repository**
-2. Name: `squash-booking`
-3. Public ✓ (חינם)
-4. לחצי **Create repository**
-
-### 2.3 העלי את הקבצים
-שיטה קלה — דרך האתר:
-1. בדף הריפוזיטורי, לחצי **uploading an existing file**
-2. גרור את כל התיקייה `squash-app` לחלון
-3. לחצי **Commit changes**
-
-**או** דרך Terminal (אם מותקן Git):
 ```bash
-cd squash-app
-git init
-git add .
-git commit -m "first commit"
-git remote add origin https://github.com/YOUR_USERNAME/squash-booking.git
-git push -u origin main
+npm install
+cp .env.example .env   # fill in your values
+npm run dev
 ```
 
 ---
 
-## שלב 3 — פריסה ב-Vercel
+## שלב 1 — Supabase
 
-### 3.1 צור חשבון Vercel
-1. כנסי ל: https://vercel.com
-2. לחצי **Sign Up** → **Continue with GitHub**
-3. אשרי את ההרשאות
+1. היכנסי ל-https://supabase.com ולחצי **New Project** (שם: `squash-match`, אזור: West EU)
+2. בתפריט: **SQL Editor → New Query**
+3. העתיקי את כל התוכן של `supabase/schema.sql` והדביקי → **Run**
+   (אמור להופיע: "Success. No rows returned")
+4. בתפריט: **Settings → API** והעתיקי:
+   - **Project URL** (למשל `https://abcdefgh.supabase.co`)
+   - **anon public** key (מחרוזת ארוכה שמתחילה ב-`eyJ...`)
 
-### 3.2 ייבא את הפרויקט
-1. לחצי **Add New Project**
-2. מצאי את `squash-booking` ולחצי **Import**
-3. Framework Preset: **Vite** (יזוהה אוטומטית)
-4. לחצי **Environment Variables** — הוסיפי:
+## שלב 2 — Vercel
+
+1. היכנסי ל-https://vercel.com → **Add New Project**
+2. ייבאי את הריפוזיטורי `squash` מ-GitHub (Framework Preset: **Vite** — מזוהה אוטומטית)
+3. תחת **Environment Variables** הוסיפי:
 
 | Key | Value |
 |-----|-------|
-| `VITE_SUPABASE_URL` | `https://abcdefgh.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | `eyJ...` (המפתח הארוך) |
+| `VITE_SUPABASE_URL` | ה-Project URL מ-Supabase |
+| `VITE_SUPABASE_ANON_KEY` | מפתח ה-anon מ-Supabase |
+| `VITE_ADMIN_PASSWORD` | סיסמת מנהל חזקה שתבחרי |
 
-5. לחצי **Deploy**
-6. המתיני ~1 דקה
+4. לחצי **Deploy** — תוך דקה יש לינק לשליחה לשחקנים 🎉
 
-### 3.3 קבלי את הלינק!
-Vercel תיתן לך כתובת כמו:
-```
-https://squash-booking-neve-sharet.vercel.app
-```
-**זהו! שלחי את הלינק הזה ללקוחות** 🎉
+## Admin panel
 
----
+- From the login screen tap **"כניסת מנהל" / "Admin login"**
+- Username: `jackie` · Password: the value of `VITE_ADMIN_PASSWORD`
+- If the env var is not set, the admin panel is disabled and shows a clear message
 
-## שלב 4 — כתובת מותאמת (אופציונלי)
+> ⚠️ Note: this is a client-side app — the admin password and the Supabase anon
+> key are embedded in the built bundle, and the database uses open RLS policies.
+> That is fine for a friendly club app, but don't store sensitive data here.
 
-אם רוצה כתובת כמו `squash.neve-sharet.co.il`:
-1. קני דומיין ב-GoDaddy או Namecheap (~₪40/שנה)
-2. ב-Vercel → Settings → Domains → הוסיפי את הדומיין
-3. עדכני את ה-DNS לפי ההוראות של Vercel
+## Rating system
 
----
-
-## עדכון האפליקציה בעתיד
-
-כל שינוי בקוד:
-1. עדכני את הקבצים ב-GitHub (גרור ושחרר שוב)
-2. Vercel מעדכנת אוטומטית תוך דקה! ✨
-
----
-
-## תמיכה
-
-**אם משהו לא עובד:**
-- בדקי שה-SQL רץ ללא שגיאות
-- ודאי שה-URL ו-ANON_KEY מדויקים (ללא רווחים)
-- ב-Vercel: לחצי Deployments → בדקי שאין שגיאות Build
-
----
-
-## פרטי הכניסה לאפליקציה
-- **סיסמת מנהל:** `squash2024`
-- ניתן לשנות בקובץ `src/App.jsx` בשורה: `const ADMIN_PWD = "squash2024"`
+- Quiz total (10–50) maps linearly to USR **2.0–5.5**
+- On a confirmed result: winner gains `0.1 + 0.2 × (1 − expected)` — between **+0.1** (beating a much weaker player) and **+0.3** (a big upset); the loser loses the same amount
+- Internal rating is precise (2 decimals); the displayed rating moves in **0.5 steps**
+- Protection: a result vs an opponent you already had a rated game with in the past 7 days is recorded but **unrated**; a player's rating is frozen until they've played **3+ unique opponents**
