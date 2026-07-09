@@ -54,7 +54,8 @@ npm run dev
 
 - From the login screen tap **"כניסת מנהל" / "Admin login"**
 - Username: `jackie` · Password: the value of `VITE_ADMIN_PASSWORD`
-- If the env var is not set, the admin panel is disabled and shows a clear message
+- If the env var is not set, the password defaults to **`squash2024`** —
+  set `VITE_ADMIN_PASSWORD` in Vercel to change it for production
 
 > ⚠️ Note: this is a client-side app — the admin password and the Supabase anon
 > key are embedded in the built bundle, and the database uses open RLS policies.

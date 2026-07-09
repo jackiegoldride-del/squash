@@ -7,7 +7,7 @@ import {
 import * as db from './db.js'
 
 const ADMIN_USER = 'jackie'
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || ''
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'squash2024'
 
 const SESSION_KEY = 'squash_match_session'
 const LANG_KEY = 'squash_match_lang'
@@ -912,7 +912,6 @@ function AdminScreen({ t, lang, setLang, data, reload, confirmMatch, onExit }) {
   const [tab, setTab] = useState('players')
 
   const login = () => {
-    if (!ADMIN_PASSWORD) return setError(t.adminNotConfigured)
     if (user.trim().toLowerCase() === ADMIN_USER && pwd === ADMIN_PASSWORD) {
       localStorage.setItem(SESSION_KEY, '__admin__')
       setAuthed(true)
