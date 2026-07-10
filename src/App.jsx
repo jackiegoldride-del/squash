@@ -210,7 +210,7 @@ export default function App() {
           setScreen('login')
         }} />
       )}
-      {!db.isCloud() && <p className="muted small footer-note">{t.localMode}</p>}
+      <p className="muted small footer-note">{db.isCloud() ? t.cloudMode : t.localMode}</p>
     </div>
   )
 }
@@ -359,7 +359,10 @@ function RegisterScreen({ t, data, reload, quizResult, initialPhone, onRegistere
       await reload()
       onRegistered(player)
     } catch (e) {
-      setError(t.phoneTaken)
+      // Only a unique-constraint violation means the phone is taken;
+      // anything else (missing tables, bad keys, network) gets the real error.
+      const isDuplicate = e?.code === '23505' || /duplicate|unique/i.test(e?.message || '')
+      setError(isDuplicate ? t.phoneTaken : t.saveError(e?.message || ''))
       setBusy(false)
     }
   }
