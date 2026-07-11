@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>בית הספר הקטן לשוק ההון</title>
+<style>
+  :root{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --line:#D7E6DD; --chip:#E4F1E9;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+      --accent:#3ECF8E; --line:#2A4238; --chip:#1F3A2F; }
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg); color:var(--ink); min-height:100vh;
+    font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew","Arial Hebrew",Arial,sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:6vh 6vw}
+  .wrap{max-width:560px; width:100%; display:flex; flex-direction:column; gap:18px}
+  .hero{font-size:56px; text-align:center}
+  h1{font-size:clamp(26px,6vw,36px); font-weight:900; text-align:center; text-wrap:balance}
+  p.sub{color:var(--muted); text-align:center; line-height:1.6}
+  a.item{
+    display:flex; align-items:center; gap:16px; text-decoration:none; color:var(--ink);
+    background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px 20px;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  a.item:active{transform:scale(.98)}
+  a.item:hover{border-color:var(--accent)}
+  .ic{font-size:34px}
+  .item b{font-size:17px}
+  .item span{display:block; color:var(--muted); font-size:13.5px; margin-top:3px; line-height:1.5}
+  .arrow{margin-inline-start:auto; color:var(--accent); font-weight:900; font-size:20px}
+  footer{color:var(--muted); font-size:12px; text-align:center; line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">🏫💰</div>
+  <h1>בית הספר הקטן לשוק ההון</h1>
+  <p class="sub">קורס משפחתי מאפס — להורה ולבן ה-18</p>
+  <a class="item" href="presentation.html">
+    <span class="ic">📊</span>
+    <span><b>המצגת</b><span>14 שקפים: ממה זו מניה ועד תוכנית ההשקעה — עם גרף ריבית דריבית חי</span></span>
+    <span class="arrow">←</span>
+  </a>
+  <a class="item" href="video.html">
+    <span class="ic">🎬</span>
+    <span><b>שיעור הווידאו</b><span>סרטון מונפש של ~4 דקות עם כתוביות וקריינות — נקודת ההתחלה הכי כיפית</span></span>
+    <span class="arrow">←</span>
+  </a>
+  <a class="item" href="podcast.html">
+    <span class="ic">🎙️</span>
+    <span><b>הפודקאסט</b><span>"כדור השלג" — פרקים קצרים שהדפדפן מקריא בקול, או שמקריאים יחד</span></span>
+    <span class="arrow">←</span>
+  </a>
+  <footer>חומר לימודי בלבד — לא ייעוץ השקעות אישי.<br>תוכנית הלימודים ומדריך ההשקעות המלאים נמצאים בתיקיית stock-market-school בריפו.</footer>
+</div>
+</body>
+</html>

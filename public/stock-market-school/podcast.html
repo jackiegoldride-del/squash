@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פודקאסט "כדור השלג" — נגן</title>
+</head>
+<body>
+<style>
+  :root{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --gold:#B27C1E; --line:#D7E6DD; --chip:#E4F1E9; --blue:#2B6CB0;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+      --accent:#3ECF8E; --gold:#E0B25C; --line:#2A4238; --chip:#1F3A2F; --blue:#7FB5F0; }
+  }
+  :root[data-theme="dark"]{ --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+    --accent:#3ECF8E; --gold:#E0B25C; --line:#2A4238; --chip:#1F3A2F; --blue:#7FB5F0; }
+  :root[data-theme="light"]{ --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --gold:#B27C1E; --line:#D7E6DD; --chip:#E4F1E9; --blue:#2B6CB0; }
+
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew","Arial Hebrew",Arial,sans-serif}
+  .app{direction:rtl; max-width:760px; margin:0 auto; padding:4vh 5vw 8vh; display:flex; flex-direction:column; gap:2.2vh}
+  h1{font-size:clamp(24px,4.5vh,34px); font-weight:900; text-wrap:balance}
+  .sub{color:var(--muted); line-height:1.6; max-width:60ch}
+  .eps{display:flex; gap:.5em; flex-wrap:wrap}
+  .eps button{font:inherit; font-weight:800; cursor:pointer; border:1px solid var(--line);
+    background:var(--card); color:var(--muted); border-radius:99px; padding:.5em 1.2em}
+  .eps button.on{color:var(--accent); border-color:var(--accent); background:var(--chip)}
+  .player{position:sticky; top:0; background:var(--bg); padding:1.2vh 0; display:flex; gap:.6em; align-items:center; flex-wrap:wrap; border-bottom:1px solid var(--line); z-index:2}
+  .player button{font:inherit; font-weight:800; cursor:pointer; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); border-radius:12px; padding:.55em 1.1em}
+  .player button.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  button:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .note{font-size:12.5px; color:var(--muted)}
+  .script{display:flex; flex-direction:column; gap:1vh}
+  .ln{display:flex; gap:.9em; padding:.9em 1.1em; border-radius:14px; background:var(--card);
+    border:1px solid var(--line); line-height:1.65; cursor:pointer}
+  .ln .who{font-weight:900; white-space:nowrap}
+  .ln[data-w="h"] .who{color:var(--accent)}
+  .ln[data-w="k"] .who{color:var(--gold)}
+  .ln.now{border-color:var(--accent); box-shadow:0 0 0 2px var(--accent) inset}
+  .ln.sfx{color:var(--muted); font-style:italic; background:transparent; border-style:dashed}
+</style>
+
+<div class="app">
+  <h1>🎙️ פודקאסט "כדור השלג"</h1>
+  <p class="sub">הפודקאסט המשפחתי על כסף. לחצו נגן והדפדפן יקריא את הפרק בקול (עובד הכי טוב בכרום, עם קול עברי מותקן). ואפשר — ואפילו מומלץ — פשוט להקריא אותו יחד בקול: זו פעילות הלימוד הכי טובה שיש. התסריט המלא נמצא גם בקובץ <b dir="ltr">podcast.md</b>.</p>
+  <div class="eps" id="eps"></div>
+  <div class="player">
+    <button class="primary" id="play">▶ נגן פרק</button>
+    <button id="stopB">⏹ עצור</button>
+    <span class="note">לחיצה על שורה מתחילה ממנה · קול המנחה ירוק, קול דן זהוב</span>
+  </div>
+  <div class="script" id="script"></div>
+</div>
+
+<script>
+(function(){
+  var EPS=[
+    {t:"פרק 1 · הכסף שנרדם בצנצנת", lines:[
+      ["sfx","[פתיח — צליל מטבעות נופלים]"],
+      ["h","שלום לכולם, וברוכים הבאים לכדור השלג — הפודקאסט שבו אנחנו לומדים לגרום לכסף לעבוד. איתי באולפן — דן!"],
+      ["k","היי! רגע, מה זאת אומרת כסף עובד? לכסף אין ידיים."],
+      ["h","שאלה מצוינת. בוא נתחיל בסיפור. היו פעם שני אחים, יובל ונועה. כל אחד קיבל מסבתא מאה שקלים. יובל שם את הכסף בצנצנת מתחת למיטה."],
+      ["k","חכם. ככה אף אחד לא לוקח לו."],
+      ["h","נכון, אף אחד לא לוקח. אבל גם הכסף לא זז. הוא פשוט ישן שם. נועה עשתה משהו אחר — היא נתנה את הכסף למאפייה של השכן, שהיה צריך כסף לתנור חדש. בתמורה הוא הבטיח: כל חודש שהכסף אצלי, אני מוסיף לך שקל."],
+      ["k","רגע רגע. אז הכסף של נועה מרוויח כסף? בזמן שהיא בכלל ישנה?!"],
+      ["h","בדיוק! זה נקרא שהכסף שלה עובד. אחרי שנה, ליובל יש עדיין מאה שקלים. לנועה יש מאה ושתים עשרה. ואחרי עשר שנים ההבדל כבר ענק."],
+      ["k","אוקיי, אבל שקל בחודש זה לא הופך אותך לעשיר."],
+      ["h","נכון, וכאן מגיע הקסם האמיתי, שעליו נדבר בפרק שלוש — כשהשקל שהרווחת מתחיל להרוויח שקלים בעצמו. זה נקרא ריבית דריבית, וזה כמו כדור שלג שמתגלגל במורד הר."],
+      ["k","לכן קוראים לפודקאסט ככה!"],
+      ["h","בדיוק בגלל זה. אז דן, בוא נסכם. מה למדנו היום?"],
+      ["k","שכסף בצנצנת ישן, וכסף שמשקיעים — עובד. ושסבתא של יובל ונועה נדיבה בטירוף."],
+      ["h","והמשימה שלכם עד הפרק הבא: פתחו את אפליקציית הבנק ותבדקו — כמה כסף שוכב לכם בעובר ושב וישן? ואם יש לכם חיסכון לכל ילד שהשתחרר בגיל שמונה עשרה — תבדקו כמה הצטבר שם. נתראה בפרק הבא!"],
+      ["sfx","[סיום — צליל מטבעות]"]]},
+    {t:"פרק 2 · פרוסה מהפיצה", lines:[
+      ["sfx","[פתיח]"],
+      ["h","ברוכים השבים לכדור השלג! דן, יש לך פה ריח של פיצה?"],
+      ["k","כי הבאתי פיצה! מה הקשר לכסף?"],
+      ["h","קשר ענק. תאר לך שאתה פותח פיצרייה. אתה צריך תנור, שולחנות, קמח. זה עולה שמונת אלפים שקלים — ואין לך."],
+      ["k","אז נגמר החלום?"],
+      ["h","לא! אתה חותך את העסק שלך, כמו פיצה, לשמונה פרוסות. כל פרוסה נקראת מניה. ואתה אומר לחברים: מי שקונה פרוסה באלף שקלים — יהיה שותף שלי. כשארוויח, כל פרוסה תקבל חלק מהרווח."],
+      ["k","רגע, אז מי שקונה מניה הוא לא סתם נותן כסף — הוא בעלים של חתיכה מהעסק?"],
+      ["h","בדיוק! וזה נכון גם לחברות הענקיות בעולם. כשקונים מניה של חברת משחקים, אתה בעלים של חתיכה זעירה — אבל אמיתית — מהחברה."],
+      ["k","אז אני יכול להיות בעלים של החברה שעושה את המשחק האהוב עלי?!"],
+      ["h","של חתיכה קטנטנה ממנה, כן. ואם לחברה ילך טוב — הפרוסה שלך תהיה שווה יותר. ואם ילך רע?"],
+      ["k","הפרוסה תהיה שווה פחות. אה, לכן זה מסוכן."],
+      ["h","בדיוק. ובפרק ארבע נלמד את הטריק נגד הסיכון הזה — לא לקנות פרוסה אחת, אלא סל שלם. המשימה להיום: בארוחת הערב, כל אחד אומר איזו חברה הוא מכיר מחיי היומיום — והיה רוצה פרוסה ממנה."],
+      ["sfx","[סיום]"]]}
+  ];
+  var ei=0,li=-1,playing=false;
+  var epsEl=document.getElementById('eps'),scr=document.getElementById('script');
+  var playB=document.getElementById('play'),stopB=document.getElementById('stopB');
+
+  EPS.forEach(function(e,k){
+    var b=document.createElement('button'); b.textContent=e.t;
+    b.addEventListener('click',function(){stop();ei=k;render()});
+    epsEl.appendChild(b);
+  });
+
+  function render(){
+    [].slice.call(epsEl.children).forEach(function(b,k){b.classList.toggle('on',k===ei)});
+    scr.innerHTML='';
+    EPS[ei].lines.forEach(function(l,k){
+      var d=document.createElement('div');
+      d.className='ln'+(l[0]==='sfx'?' sfx':''); d.dataset.w=l[0];
+      d.innerHTML=(l[0]==='h'?'<span class="who">מנחה:</span>':l[0]==='k'?'<span class="who">דן:</span>':'')+'<span>'+l[1]+'</span>';
+      d.addEventListener('click',function(){stop();playFrom(k)});
+      scr.appendChild(d);
+    });
+    li=-1;
+  }
+  function mark(k){
+    [].slice.call(scr.children).forEach(function(d,j){d.classList.toggle('now',j===k)});
+    if(k>=0&&scr.children[k])scr.children[k].scrollIntoView({block:'center',behavior:'smooth'});
+  }
+  function heVoice(){
+    var vs=speechSynthesis.getVoices().filter(function(v){return v.lang&&v.lang.indexOf('he')===0});
+    return vs[0]||null;
+  }
+  function playFrom(k){
+    if(!window.speechSynthesis){alert('הדפדפן הזה לא תומך בהקראה — אפשר לקרוא יחד בקול!');return}
+    playing=true; playB.textContent='⏸ השהה';
+    step(k);
+  }
+  function step(k){
+    if(!playing)return;
+    var lines=EPS[ei].lines;
+    while(k<lines.length&&lines[k][0]==='sfx')k++;
+    if(k>=lines.length){stop();mark(-1);return}
+    li=k; mark(k);
+    var u=new SpeechSynthesisUtterance(lines[k][1]);
+    u.lang='he-IL'; var v=heVoice(); if(v)u.voice=v;
+    if(lines[k][0]==='k'){u.pitch=1.15;u.rate=1.05}else{u.pitch=0.9;u.rate=0.95}
+    u.onend=function(){step(k+1)};
+    speechSynthesis.speak(u);
+  }
+  function stop(){
+    playing=false; playB.textContent='▶ נגן פרק';
+    if(window.speechSynthesis)speechSynthesis.cancel();
+  }
+  playB.addEventListener('click',function(){
+    if(playing){stop()}else{playFrom(Math.max(0,li))}
+  });
+  stopB.addEventListener('click',function(){stop();li=-1;mark(-1)});
+  if(window.speechSynthesis)speechSynthesis.getVoices();
+  render();
+})();
+</script>
+
+</body>
+</html>
