@@ -7,9 +7,10 @@ import {
 import * as db from './db.js'
 
 const ADMIN_USER = 'jackie'
-// Trim the env value: a stray space/newline pasted into Vercel would
-// otherwise make every login fail with "wrong username or password".
-const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD || '').trim() || 'squash2024'
+// Normalize the env value: stray whitespace or wrapping quotes pasted into
+// Vercel would otherwise make every login fail with "wrong username or password".
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD || '')
+  .trim().replace(/^["']+|["']+$/g, '').trim() || 'squash2024'
 
 const SESSION_KEY = 'squash_match_session'
 const LANG_KEY = 'squash_match_lang'
