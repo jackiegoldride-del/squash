@@ -91,7 +91,7 @@
 <div class="app">
   <header>
     <h1>🎬 הכסף יוצא לעבוד — שיעור מונפש למתחילים מאפס</h1>
-    <p>סרטון אינטראקטיבי בן ~4 דקות · לחצו נגן · אפשר להדליק קריינות בקול</p>
+    <p>סרטון אינטראקטיבי בן ~4 דקות · לחצו נגן · לקריינות טבעית באייפון: הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית ← כרמית (משופר)</p>
   </header>
 
   <div class="screen" id="screen">
@@ -256,12 +256,26 @@
     [].slice.call(chips.children).forEach(function(b,j){b.classList.toggle('on',j===k)});
     sceneFx(k);
   }
+  function heVoice(){
+    var vs=speechSynthesis.getVoices().filter(function(v){
+      return v.lang&&v.lang.replace('_','-').toLowerCase().indexOf('he')===0;
+    });
+    if(!vs.length)return null;
+    function score(v){
+      return (/(enhanced|premium|natural|siri|neural|משופר)/i.test(v.name)?4:0)
+           + (v.localService?2:0)
+           + (v.lang.replace('_','-').toLowerCase()==='he-il'?1:0);
+    }
+    vs.sort(function(a,b){return score(b)-score(a)});
+    return vs[0];
+  }
   function speak(t){
     if(!voice||!window.speechSynthesis)return;
     speechSynthesis.cancel();
-    var u=new SpeechSynthesisUtterance(t.replace(/[🎉🎓]/g,'')); u.lang='he-IL'; u.rate=0.95;
-    var vs=speechSynthesis.getVoices().filter(function(v){return v.lang&&v.lang.indexOf('he')===0});
-    if(vs.length)u.voice=vs[0];
+    var clean=t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu,'')
+               .replace(/₪/g,' שקלים').replace(/["'״׳]/g,'').replace(/\s+/g,' ').trim();
+    var u=new SpeechSynthesisUtterance(clean); u.lang='he-IL'; u.rate=0.97; u.pitch=1;
+    var v=heVoice(); if(v)u.voice=v;
     speechSynthesis.speak(u);
   }
   function step(){
@@ -305,6 +319,9 @@
     var t=frac*total,acc=0;
     for(var k=0;k<SC.length;k++){var d=0;SC[k].lines.forEach(function(l){d+=l[1]});if(acc+d>t){jump(k);return}acc+=d}
   });
-  if(window.speechSynthesis)speechSynthesis.getVoices();
+  if(window.speechSynthesis){
+    speechSynthesis.getVoices();
+    if(speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',function(){speechSynthesis.getVoices()});
+  }
 })();
 </script>

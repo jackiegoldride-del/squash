@@ -48,7 +48,7 @@
 
 <div class="app">
   <h1>🎙️ פודקאסט "כדור השלג"</h1>
-  <p class="sub">הפודקאסט המשפחתי על כסף. לחצו נגן והדפדפן יקריא את הפרק בקול (עובד הכי טוב בכרום, עם קול עברי מותקן). ואפשר — ואפילו מומלץ — פשוט להקריא אותו יחד בקול: זו פעילות הלימוד הכי טובה שיש. התסריט המלא נמצא גם בקובץ <b dir="ltr">podcast.md</b>.</p>
+  <p class="sub">הפודקאסט המשפחתי על כסף. לחצו נגן והדפדפן יקריא את הפרק בקול. <b>טיפ לאייפון:</b> לקול טבעי בהרבה, הורידו פעם אחת את הקול המשופר — הגדרות ← נגישות ← תוכן מדובר ← קולות ← עברית ← <b>כרמית (משופר)</b>. ואפשר — ואפילו מומלץ — פשוט להקריא את התסריט יחד בקול: זו פעילות הלימוד הכי טובה שיש.</p>
   <div class="eps" id="eps"></div>
   <div class="player">
     <button class="primary" id="play">▶ נגן פרק</button>
@@ -119,8 +119,21 @@
     if(k>=0&&scr.children[k])scr.children[k].scrollIntoView({block:'center',behavior:'smooth'});
   }
   function heVoice(){
-    var vs=speechSynthesis.getVoices().filter(function(v){return v.lang&&v.lang.indexOf('he')===0});
-    return vs[0]||null;
+    var vs=speechSynthesis.getVoices().filter(function(v){
+      return v.lang&&v.lang.replace('_','-').toLowerCase().indexOf('he')===0;
+    });
+    if(!vs.length)return null;
+    function score(v){
+      return (/(enhanced|premium|natural|siri|neural|משופר)/i.test(v.name)?4:0)
+           + (v.localService?2:0)
+           + (v.lang.replace('_','-').toLowerCase()==='he-il'?1:0);
+    }
+    vs.sort(function(a,b){return score(b)-score(a)});
+    return vs[0];
+  }
+  function cleanForSpeech(t){
+    return t.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu,'')
+            .replace(/₪/g,' שקלים').replace(/["'״׳]/g,'').replace(/\s+/g,' ').trim();
   }
   function playFrom(k){
     if(!window.speechSynthesis){alert('הדפדפן הזה לא תומך בהקראה — אפשר לקרוא יחד בקול!');return}
@@ -133,9 +146,9 @@
     while(k<lines.length&&lines[k][0]==='sfx')k++;
     if(k>=lines.length){stop();mark(-1);return}
     li=k; mark(k);
-    var u=new SpeechSynthesisUtterance(lines[k][1]);
+    var u=new SpeechSynthesisUtterance(cleanForSpeech(lines[k][1]));
     u.lang='he-IL'; var v=heVoice(); if(v)u.voice=v;
-    if(lines[k][0]==='k'){u.pitch=1.15;u.rate=1.05}else{u.pitch=0.9;u.rate=0.95}
+    u.pitch=1; u.rate=(lines[k][0]==='k')?1.02:0.95;
     u.onend=function(){step(k+1)};
     speechSynthesis.speak(u);
   }
@@ -147,7 +160,10 @@
     if(playing){stop()}else{playFrom(Math.max(0,li))}
   });
   stopB.addEventListener('click',function(){stop();li=-1;mark(-1)});
-  if(window.speechSynthesis)speechSynthesis.getVoices();
+  if(window.speechSynthesis){
+    speechSynthesis.getVoices();
+    if(speechSynthesis.addEventListener)speechSynthesis.addEventListener('voiceschanged',function(){speechSynthesis.getVoices()});
+  }
   render();
 })();
 </script>
