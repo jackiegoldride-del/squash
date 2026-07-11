@@ -7,7 +7,9 @@ import {
 import * as db from './db.js'
 
 const ADMIN_USER = 'jackie'
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'squash2024'
+// Trim the env value: a stray space/newline pasted into Vercel would
+// otherwise make every login fail with "wrong username or password".
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD || '').trim() || 'squash2024'
 
 const SESSION_KEY = 'squash_match_session'
 const LANG_KEY = 'squash_match_lang'
@@ -915,7 +917,7 @@ function AdminScreen({ t, lang, setLang, data, reload, confirmMatch, onExit }) {
   const [tab, setTab] = useState('players')
 
   const login = () => {
-    if (user.trim().toLowerCase() === ADMIN_USER && pwd === ADMIN_PASSWORD) {
+    if (user.trim().toLowerCase() === ADMIN_USER && pwd.trim() === ADMIN_PASSWORD) {
       localStorage.setItem(SESSION_KEY, '__admin__')
       setAuthed(true)
     } else {
