@@ -1,0 +1,310 @@
+<title>שיעור וידאו — הכסף יוצא לעבוד</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9; --sky:#DCEEFB;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+      --accent:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+      --line:#2A4238; --chip:#1F3A2F; --sky:#16303C; }
+  }
+  :root[data-theme="dark"]{ --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+    --accent:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+    --line:#2A4238; --chip:#1F3A2F; --sky:#16303C; }
+  :root[data-theme="light"]{ --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9; --sky:#DCEEFB; }
+
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew","Arial Hebrew",Arial,sans-serif;
+    height:100vh; overflow:hidden}
+  .app{direction:rtl; height:100vh; display:flex; flex-direction:column; align-items:center; padding:2vh 3vw; gap:1.4vh}
+  header{text-align:center}
+  header h1{font-size:clamp(20px,3.4vh,30px); font-weight:900}
+  header p{color:var(--muted); font-size:clamp(12px,1.9vh,15px)}
+
+  .screen{
+    position:relative; width:min(960px,94vw); flex:1; min-height:0;
+    background:linear-gradient(180deg,var(--sky) 0%,var(--card) 70%);
+    border:1px solid var(--line); border-radius:20px; overflow:hidden;
+  }
+  .scene{position:absolute; inset:0; display:none; align-items:center; justify-content:center}
+  .scene.on{display:flex}
+  .cap{
+    position:absolute; bottom:0; inset-inline:0; padding:2vh 4vw 2.4vh;
+    background:linear-gradient(0deg,var(--card) 62%,transparent);
+    text-align:center; font-size:clamp(16px,2.8vh,24px); font-weight:800; line-height:1.5;
+    min-height:16vh; display:flex; align-items:flex-end; justify-content:center; text-wrap:balance;
+  }
+  .cap span{max-width:34ch}
+
+  /* actors */
+  .act{position:absolute; font-size:clamp(40px,9vh,84px); line-height:1; transition:all .8s ease}
+  .lbl{position:absolute; font-weight:800; font-size:clamp(12px,2vh,17px); color:var(--muted); text-align:center}
+  .coin{position:absolute; font-size:clamp(20px,4vh,34px); opacity:0; }
+  .counter{
+    position:absolute; top:6%; inset-inline-start:6%; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:.5em 1em; font-weight:900; font-size:clamp(16px,3vh,26px);
+    font-variant-numeric:tabular-nums; color:var(--accent); direction:ltr;
+  }
+  @keyframes floatUp{0%{opacity:0; transform:translateY(20px)}20%{opacity:1}100%{opacity:1; transform:translateY(-6px)}}
+  @keyframes rain{0%{opacity:0; transform:translateY(-30vh)}15%{opacity:1}100%{opacity:1; transform:translateY(0)}}
+  @keyframes wiggle{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  @keyframes sleep{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+  @keyframes rollAcross{0%{inset-inline-start:78%; top:16%; font-size:26px}100%{inset-inline-start:8%; top:56%; font-size:110px}}
+  @keyframes upP{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+  .anim-sleep{animation:sleep 3s ease-in-out infinite}
+  .anim-wiggle{animation:wiggle 1.6s ease-in-out infinite}
+  .anim-pulse{animation:pulse 1.4s ease-in-out infinite}
+  .anim-up{animation:upP 1.6s ease-in-out infinite}
+  .fade{animation:fadeIn .7s ease both}
+  @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important} }
+
+  .slope{position:absolute; inset-inline:0; bottom:0; height:58%;
+    background:linear-gradient(11deg, var(--chip) 49%, transparent 50%)}
+  .pizza{width:clamp(160px,30vh,260px); height:auto}
+  .rule{position:absolute; background:var(--card); border:2px solid var(--accent); border-radius:14px;
+    padding:.7em 1.1em; font-weight:800; font-size:clamp(13px,2.2vh,18px); opacity:0; max-width:38ch; text-align:center}
+
+  /* controls */
+  .ctrl{width:min(960px,94vw); display:flex; flex-direction:column; gap:1vh}
+  .track{height:8px; background:var(--line); border-radius:99px; overflow:hidden; cursor:pointer}
+  .fill{height:100%; width:0%; background:var(--accent); border-radius:99px; transition:width .3s linear}
+  .row{display:flex; align-items:center; gap:.7em; flex-wrap:wrap; justify-content:center}
+  button{font:inherit; font-weight:800; cursor:pointer; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); border-radius:12px; padding:.55em 1.1em}
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff; font-size:1.05em}
+  button[aria-pressed="true"]{background:var(--chip); border-color:var(--accent); color:var(--accent)}
+  button:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .scenes{display:flex; gap:.4em; flex-wrap:wrap; justify-content:center}
+  .scenes button{font-size:12px; padding:.4em .8em; border-radius:99px; color:var(--muted)}
+  .scenes button.on{color:var(--accent); border-color:var(--accent); background:var(--chip)}
+</style>
+
+<div class="app">
+  <header>
+    <h1>🎬 הכסף יוצא לעבוד — שיעור מונפש לילדים</h1>
+    <p>סרטון אינטראקטיבי בן ~4 דקות · לחצו נגן · אפשר להדליק קריינות בקול</p>
+  </header>
+
+  <div class="screen" id="screen">
+
+    <div class="scene on" data-s="0">
+      <div class="act" style="top:14%; inset-inline-start:44%; font-size:clamp(60px,13vh,120px)">🏫</div>
+      <div class="coin" style="inset-inline-start:20%; top:0; animation:rain 2.2s .2s ease both">🪙</div>
+      <div class="coin" style="inset-inline-start:32%; top:4%; animation:rain 2.2s .7s ease both">🪙</div>
+      <div class="coin" style="inset-inline-start:63%; top:2%; animation:rain 2.2s .4s ease both">🪙</div>
+      <div class="coin" style="inset-inline-start:74%; top:6%; animation:rain 2.2s 1s ease both">🪙</div>
+    </div>
+
+    <div class="scene" data-s="1">
+      <div class="act anim-sleep" style="inset-inline-start:18%; top:22%">😴🫙</div>
+      <div class="lbl" style="inset-inline-start:14%; top:56%; width:20%">הכסף של יובל<br>ישן בצנצנת</div>
+      <div class="act anim-wiggle" style="inset-inline-end:18%; top:22%">👷🪙</div>
+      <div class="lbl" style="inset-inline-end:14%; top:56%; width:20%">הכסף של נועה<br>יצא לעבודה</div>
+      <div class="coin" id="w1" style="inset-inline-end:24%; top:40%">🪙</div>
+      <div class="coin" id="w2" style="inset-inline-end:19%; top:36%">🪙</div>
+      <div class="coin" id="w3" style="inset-inline-end:29%; top:34%">🪙</div>
+    </div>
+
+    <div class="scene" data-s="2">
+      <div class="act" style="inset-inline-start:42%; top:20%; font-size:clamp(60px,13vh,110px)">🍋🥤</div>
+      <div class="counter" id="profit">0 ₪</div>
+      <div class="coin" id="c1" style="inset-inline-start:30%; top:48%">🪙</div>
+      <div class="coin" id="c2" style="inset-inline-start:50%; top:50%">🪙</div>
+      <div class="coin" id="c3" style="inset-inline-start:64%; top:46%">🪙</div>
+    </div>
+
+    <div class="scene" data-s="3">
+      <svg class="pizza" viewBox="-110 -110 220 220" aria-label="פיצה שנחתכת לשמונה מניות">
+        <g id="pz"></g>
+      </svg>
+      <div class="lbl" style="bottom:26%; inset-inline-start:0; width:100%">8 פרוסות = 8 מניות. כל פרוסה — שותף אמיתי בעסק!</div>
+    </div>
+
+    <div class="scene" data-s="4">
+      <div class="act" style="inset-inline-start:12%; top:22%">🍓</div>
+      <div class="act anim-up" style="inset-inline-start:12%; top:8%; font-size:clamp(24px,5vh,44px); color:var(--accent)" id="up1">📈</div>
+      <div class="lbl" style="inset-inline-start:8%; top:52%; width:16%">כולם רוצים —<br>המחיר עולה</div>
+      <div class="act" style="inset-inline-end:12%; top:22%">🥀</div>
+      <div class="act" style="inset-inline-end:12%; top:8%; font-size:clamp(24px,5vh,44px)" id="dn1">📉</div>
+      <div class="lbl" style="inset-inline-end:8%; top:52%; width:16%">אף אחד לא רוצה —<br>המחיר יורד</div>
+      <div class="act anim-wiggle" style="inset-inline-start:44%; top:18%; font-size:clamp(50px,11vh,96px)">🏪</div>
+    </div>
+
+    <div class="scene" data-s="5">
+      <div class="slope"></div>
+      <div class="act" id="snow" style="inset-inline-start:78%; top:16%; font-size:26px">⚪</div>
+      <div class="counter" id="snowCnt">100 ₪</div>
+    </div>
+
+    <div class="scene" data-s="6">
+      <div class="act" style="inset-inline-start:16%; top:20%">🍓</div>
+      <div class="act" id="rot" style="inset-inline-start:16%; top:20%; opacity:0">🤢</div>
+      <div class="lbl" style="inset-inline-start:10%; top:50%; width:20%">הכל על תות אחד…</div>
+      <div class="act anim-pulse" style="inset-inline-end:14%; top:16%; font-size:clamp(56px,12vh,104px)">🧺</div>
+      <div class="lbl" style="inset-inline-end:8%; top:52%; width:22%">סל שלם של חברות —<br>זה מדד!</div>
+    </div>
+
+    <div class="scene" data-s="7">
+      <div class="rule" style="top:8%;  inset-inline-start:8%"  id="r1">1 · משקיעים רק כסף שלא צריך בקרוב</div>
+      <div class="rule" style="top:24%; inset-inline-end:8%"   id="r2">2 · קונים כל חודש — לא מנחשים מתי</div>
+      <div class="rule" style="top:40%; inset-inline-start:10%" id="r3">3 · סל שלם ולא תות אחד</div>
+      <div class="rule" style="top:56%; inset-inline-end:10%"  id="r4">4 · כשיורד — לא בורחים</div>
+      <div class="rule" style="top:72%; inset-inline-start:30%" id="r5">5 · לא מבינים? לא קונים 🎓</div>
+    </div>
+
+    <div class="cap"><span id="cap">לחצו על ▶ נגן כדי להתחיל</span></div>
+  </div>
+
+  <div class="ctrl">
+    <div class="track" id="track" role="progressbar" aria-label="התקדמות"><div class="fill" id="fill"></div></div>
+    <div class="row">
+      <button class="primary" id="play">▶ נגן</button>
+      <button id="voice" aria-pressed="false">🔊 קריינות: כבויה</button>
+      <button id="restart">⟲ מההתחלה</button>
+    </div>
+    <div class="scenes" id="chips"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SC=[
+    {name:"פתיחה", lines:[
+      ["שלום! ברוכים הבאים לבית הספר הקטן לשוק ההון.",4200],
+      ["בארבע הדקות הקרובות נלמד איך כסף יכול לעבוד בשבילנו.",4600]]},
+    {name:"כסף עובד", lines:[
+      ["יובל שם 100 שקלים בצנצנת מתחת למיטה. הכסף שלו... נרדם.",5200],
+      ["נועה השקיעה את הכסף שלה — ועכשיו הוא עובד ומרוויח עוד מטבעות, אפילו כשהיא ישנה!",6200],
+      ["מי שמשקיע — שולח את הכסף שלו לעבודה.",4200]]},
+    {name:"מה זו חברה", lines:[
+      ["חברה היא קבוצת אנשים שמוכרת משהו שאנשים רוצים. כמו דוכן לימונדה!",5400],
+      ["קונים לימונים בעשרה שקלים, מוכרים לימונדה בשלושים...",4800],
+      ["מה שנשאר ביד נקרא רווח. כל חברה ענקית התחילה קטנה!",5000]]},
+    {name:"מה זו מניה", lines:[
+      ["כדי לגדול, חברה חותכת את עצמה לפרוסות — כמו פיצה.",4800],
+      ["כל פרוסה נקראת מניה. מי שקונה פרוסה נהיה שותף אמיתי!",5200],
+      ["כשהחברה מרוויחה — כל פרוסה שווה יותר.",4200]]},
+    {name:"הבורסה", lines:[
+      ["הבורסה היא פשוט שוק — אבל במקום פירות, מוכרים בו חלקים של חברות.",5400],
+      ["כשכולם רוצים לקנות — המחיר עולה. כשכולם רוצים למכור — המחיר יורד.",5600],
+      ["ככה בדיוק זזים מחירי המניות, כל יום.",4000]]},
+    {name:"כדור השלג", lines:[
+      ["ועכשיו — הקסם הכי גדול: ריבית דריבית!",4200],
+      ["כדור שלג קטן שמתגלגל במורד ההר אוסף עוד שלג בכל סיבוב...",5200],
+      ["וככל שהוא גדול יותר — הוא גדל מהר יותר! ככה כסף מושקע גדל עם השנים.",5800],
+      ["מאה שקלים בחודש יכולים להפוך, אחרי הרבה שנים, לעשרות אלפי שקלים.",5400]]},
+    {name:"פיזור", lines:[
+      ["רגע, ומה אם החברה שבחרנו תיכשל? בשביל זה יש פיזור!",5000],
+      ["מי ששם הכל על תות אחד — מסתכן שהוא יירקב.",4600],
+      ["לכן קונים סל שלם: קרן מדד עם מאות חברות בבת אחת. חכם, נכון?",5600]]},
+    {name:"כללי הזהב", lines:[
+      ["ולסיום — חמשת כללי הזהב של המשקיעים החכמים:",4400],
+      ["משקיעים רק כסף שלא צריך בקרוב.",3400],
+      ["קונים קצת כל חודש, ולא מנחשים מתי.",3600],
+      ["מפזרים — סל שלם ולא תות אחד.",3400],
+      ["וכשהשוק יורד? נשארים רגועים. לא בורחים.",4200],
+      ["ואם לא מבינים משהו — לא קונים אותו. סוף השיעור. עכשיו — לצנצנת! 🎉",6200]]}
+  ];
+  var scenes=[].slice.call(document.querySelectorAll('.scene'));
+  var cap=document.getElementById('cap'),fill=document.getElementById('fill');
+  var playBtn=document.getElementById('play'),voiceBtn=document.getElementById('voice');
+  var chips=document.getElementById('chips');
+  var total=0; SC.forEach(function(s){s.lines.forEach(function(l){total+=l[1]})});
+  var playing=false,voice=false,si=0,li=0,timer=null,elapsed=0;
+
+  SC.forEach(function(s,k){
+    var b=document.createElement('button'); b.textContent=(k+1)+' · '+s.name;
+    b.addEventListener('click',function(){jump(k)}); chips.appendChild(b);
+  });
+
+  /* pizza slices */
+  (function(){
+    var g=document.getElementById('pz'),s='';
+    for(var k=0;k<8;k++){
+      var a0=(k*45-90)*Math.PI/180,a1=((k+1)*45-90)*Math.PI/180,R=100;
+      s+='<path d="M0,0 L'+(R*Math.cos(a0)).toFixed(1)+','+(R*Math.sin(a0)).toFixed(1)+
+         ' A'+R+','+R+' 0 0 1 '+(R*Math.cos(a1)).toFixed(1)+','+(R*Math.sin(a1)).toFixed(1)+
+         ' Z" fill="'+(k%2?'#E8A33D':'#D97B29')+'" stroke="var(--card)" stroke-width="4" '+
+         'style="opacity:0; animation:fadeIn .5s '+(k*0.35)+'s ease both"/>';
+    }
+    g.innerHTML=s;
+  })();
+
+  function sceneFx(k){
+    if(k===1){['w1','w2','w3'].forEach(function(id,j){var el=document.getElementById(id);el.style.animation='none';void el.offsetWidth;el.style.animation='floatUp 1.4s '+(1+j*1.6)+'s ease both'})}
+    if(k===2){var p=document.getElementById('profit'),v=0;['c1','c2','c3'].forEach(function(id,j){var el=document.getElementById(id);el.style.animation='none';void el.offsetWidth;el.style.animation='floatUp 1.2s '+(1.5+j*2.4)+'s ease both'});
+      var iv=setInterval(function(){if(si!==2||!playing){clearInterval(iv);return} v=Math.min(20,v+1);p.textContent=v+' ₪ רווח';if(v===20)clearInterval(iv)},420);}
+    if(k===3){var ps=document.querySelectorAll('#pz path');ps.forEach(function(p,j){p.style.animation='none';void p.offsetWidth;p.style.animation='fadeIn .5s '+(j*0.35)+'s ease both'})}
+    if(k===5){var sn=document.getElementById('snow'),cn=document.getElementById('snowCnt');
+      sn.style.animation='none';void sn.offsetWidth;sn.style.animation='rollAcross 16s linear both';
+      var v0=100,iv2=setInterval(function(){if(si!==5||!playing){clearInterval(iv2);return} v0=Math.round(v0*1.35);if(v0>80000){v0=81000;clearInterval(iv2)} cn.textContent=v0.toLocaleString('he-IL')+' ₪'},900);}
+    if(k===6){var r=document.getElementById('rot');r.style.opacity=0;setTimeout(function(){if(si===6)r.style.opacity=1},3800)}
+    if(k===7){for(var j=1;j<=5;j++){(function(j){var el=document.getElementById('r'+j);el.style.animation='none';void el.offsetWidth;el.style.animation='fadeIn .6s '+((j-1)*3.6+1)+'s ease both'})(j)}}
+  }
+
+  function show(k){
+    scenes.forEach(function(s,j){s.classList.toggle('on',j===k)});
+    [].slice.call(chips.children).forEach(function(b,j){b.classList.toggle('on',j===k)});
+    sceneFx(k);
+  }
+  function speak(t){
+    if(!voice||!window.speechSynthesis)return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(t.replace(/[🎉🎓]/g,'')); u.lang='he-IL'; u.rate=0.95;
+    var vs=speechSynthesis.getVoices().filter(function(v){return v.lang&&v.lang.indexOf('he')===0});
+    if(vs.length)u.voice=vs[0];
+    speechSynthesis.speak(u);
+  }
+  function step(){
+    if(!playing)return;
+    if(si>=SC.length){stop(true);return}
+    if(li>=SC[si].lines.length){si++;li=0;if(si>=SC.length){stop(true);return} show(si);}
+    var line=SC[si].lines[li];
+    cap.textContent=line[0]; speak(line[0]);
+    fill.style.width=(elapsed/total*100)+'%';
+    timer=setTimeout(function(){elapsed+=line[1];li++;step()},line[1]);
+  }
+  function stop(done){
+    playing=false; clearTimeout(timer);
+    if(window.speechSynthesis)speechSynthesis.cancel();
+    playBtn.textContent='▶ נגן';
+    if(done){cap.textContent='זהו! עכשיו אתם יודעים יותר מרוב המבוגרים 🎓 רוצים שוב? לחצו ⟲';fill.style.width='100%'}
+  }
+  function start(){
+    playing=true; playBtn.textContent='⏸ הפסקה'; show(si); step();
+  }
+  function jump(k){
+    clearTimeout(timer); if(window.speechSynthesis)speechSynthesis.cancel();
+    si=k;li=0;elapsed=0;
+    for(var j=0;j<k;j++)SC[j].lines.forEach(function(l){elapsed+=l[1]});
+    fill.style.width=(elapsed/total*100)+'%';
+    show(k);
+    if(playing)step(); else{cap.textContent=SC[k].lines[0][0]}
+  }
+  playBtn.addEventListener('click',function(){
+    if(playing){stop(false)} else{if(si>=SC.length){si=0;li=0;elapsed=0} start()}
+  });
+  document.getElementById('restart').addEventListener('click',function(){jump(0);if(!playing)start()});
+  voiceBtn.addEventListener('click',function(){
+    voice=!voice;
+    voiceBtn.textContent=voice?'🔊 קריינות: פועלת':'🔊 קריינות: כבויה';
+    voiceBtn.setAttribute('aria-pressed',voice);
+    if(!voice&&window.speechSynthesis)speechSynthesis.cancel();
+  });
+  document.getElementById('track').addEventListener('click',function(e){
+    var r=this.getBoundingClientRect(),frac=1-((e.clientX-r.left)/r.width); /* rtl */
+    var t=frac*total,acc=0;
+    for(var k=0;k<SC.length;k++){var d=0;SC[k].lines.forEach(function(l){d+=l[1]});if(acc+d>t){jump(k);return}acc+=d}
+  });
+  if(window.speechSynthesis)speechSynthesis.getVoices();
+})();
+</script>

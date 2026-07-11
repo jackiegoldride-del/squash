@@ -1,0 +1,335 @@
+<title>בית הספר הקטן לשוק ההון — מצגת</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --accent-ink:#0B6B4A; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9;
+    --c1:#0E8A5F; --c2:#B27C1E; /* validated chart series (light) */
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+      --accent:#3ECF8E; --accent-ink:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+      --line:#2A4238; --chip:#1F3A2F;
+      --c1:#1D9D68; --c2:#B08327; /* validated chart series (dark) */
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+    --accent:#3ECF8E; --accent-ink:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+    --line:#2A4238; --chip:#1F3A2F;
+    --c1:#1D9D68; --c2:#B08327;
+  }
+  :root[data-theme="light"]{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --accent-ink:#0B6B4A; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9;
+    --c1:#0E8A5F; --c2:#B27C1E;
+  }
+  *{box-sizing:border-box; margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew","Arial Hebrew",Arial,sans-serif;
+    overflow:hidden; height:100vh;
+  }
+  .deck{direction:rtl; height:100vh; display:flex; flex-direction:column}
+  .stage{flex:1; position:relative; overflow:hidden}
+  .slide{
+    position:absolute; inset:0; display:none; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center;
+    padding:4vh 8vw; gap:2.2vh;
+  }
+  .slide.on{display:flex; animation:enter .45s ease}
+  @keyframes enter{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){ .slide.on{animation:none} }
+
+  .eyebrow{
+    font-size:clamp(12px,1.6vh,15px); font-weight:700; color:var(--accent-ink);
+    background:var(--chip); border-radius:999px; padding:.45em 1.1em; letter-spacing:.02em;
+  }
+  h1{font-size:clamp(30px,7vh,64px); font-weight:900; line-height:1.15; text-wrap:balance; max-width:22ch}
+  h2{font-size:clamp(24px,5vh,44px); font-weight:900; line-height:1.2; text-wrap:balance; max-width:24ch}
+  .big{font-size:clamp(56px,14vh,120px); line-height:1}
+  p.lead{font-size:clamp(16px,2.6vh,22px); color:var(--muted); max-width:52ch; line-height:1.65}
+  .punch{
+    font-size:clamp(18px,3vh,26px); font-weight:800; color:var(--accent-ink);
+    border-block:3px solid var(--accent); padding:.6em 0; max-width:36ch; line-height:1.5;
+  }
+  .cards{display:flex; gap:1.6vh; flex-wrap:wrap; justify-content:center; max-width:1000px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:2.2vh 2.4vh; width:min(290px,80vw); text-align:right;
+    display:flex; flex-direction:column; gap:.7vh;
+  }
+  .card .ic{font-size:clamp(26px,4.5vh,40px)}
+  .card b{font-size:clamp(15px,2.2vh,19px)}
+  .card span{font-size:clamp(13px,1.9vh,16px); color:var(--muted); line-height:1.55}
+  table{border-collapse:collapse; background:var(--card); border-radius:14px; overflow:hidden; font-size:clamp(13px,2vh,17px)}
+  .tblwrap{max-width:92vw; overflow-x:auto; border:1px solid var(--line); border-radius:14px}
+  th,td{padding:.7em 1.1em; border-bottom:1px solid var(--line); text-align:right}
+  th{background:var(--chip); font-weight:800}
+  tr:last-child td{border-bottom:none}
+  td.num{font-variant-numeric:tabular-nums}
+  .warn{color:var(--coral); font-weight:700}
+  .good{color:var(--accent-ink); font-weight:700}
+
+  /* chart */
+  .figure{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:2vh 2.4vh; max-width:min(860px,92vw); width:100%}
+  .figure .ttl{font-weight:800; font-size:clamp(15px,2.2vh,19px); text-align:right}
+  .figure .sub{color:var(--muted); font-size:clamp(12px,1.8vh,15px); text-align:right; margin-top:.2em}
+  .legend{display:flex; gap:1.4em; justify-content:flex-start; margin-top:.8vh; font-size:clamp(12px,1.8vh,15px); color:var(--muted)}
+  .legend i{display:inline-block; width:14px; height:4px; border-radius:2px; vertical-align:middle; margin-inline-start:.4em}
+  #chart{width:100%; height:38vh; display:block; direction:ltr}
+  .tip{
+    position:fixed; pointer-events:none; background:var(--ink); color:var(--bg);
+    padding:.5em .8em; border-radius:8px; font-size:13px; display:none; z-index:9;
+    font-variant-numeric:tabular-nums; direction:rtl; text-align:right; line-height:1.5;
+  }
+
+  /* nav bar */
+  .bar{
+    display:flex; align-items:center; justify-content:space-between; gap:1em;
+    padding:1.2vh 2.5vw; border-top:1px solid var(--line); background:var(--card);
+  }
+  .bar .nm{font-weight:800; font-size:14px; color:var(--muted)}
+  .dots{display:flex; gap:6px; flex-wrap:wrap; justify-content:center}
+  .dots i{width:9px; height:9px; border-radius:50%; background:var(--line); cursor:pointer; transition:.2s}
+  .dots i.on{background:var(--accent); transform:scale(1.25)}
+  .btns{display:flex; gap:.5em; align-items:center}
+  button{
+    font:inherit; font-weight:800; cursor:pointer; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); border-radius:10px; padding:.5em 1em;
+  }
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  button:focus-visible,.dots i:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .cnt{font-variant-numeric:tabular-nums; color:var(--muted); font-size:13px; min-width:4.5em; text-align:center}
+  .hint{font-size:12px; color:var(--muted)}
+  @media (max-width:640px){ .hint{display:none} }
+</style>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+  <section class="slide on">
+    <div class="big">🏫💰</div>
+    <div class="eyebrow">קורס משפחתי · 8 שבועות</div>
+    <h1>בית הספר הקטן לשוק ההון</h1>
+    <p class="lead">איך כסף עובד, מה זו מניה, ולמה כדור שלג הוא תוכנית ההשקעה הכי טובה בעולם — הכל בגובה של ילד בן 8.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 1</div>
+    <h2>לכסף יש שתי אפשרויות: לישון או לעבוד</h2>
+    <div class="cards">
+      <div class="card"><div class="ic">😴</div><b>כסף שישן</b><span>שוכב בצנצנת מתחת למיטה. אחרי שנה — בדיוק אותו סכום. (ובגלל שהמחירים עולים, הוא אפילו שווה קצת פחות!)</span></div>
+      <div class="card"><div class="ic">👷</div><b>כסף שעובד</b><span>מושקע במשהו שגדל — עסק, חברה, סל חברות. בזמן שאתם בבית ספר, הוא מרוויח בשבילכם.</span></div>
+    </div>
+    <p class="punch">משקיע הוא מישהו ששולח את הכסף שלו לעבודה.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 2</div>
+    <h2>דוכן הלימונדה: מה זו חברה?</h2>
+    <div class="big">🍋🥤</div>
+    <p class="lead">חברה היא קבוצת אנשים שמוכרת משהו שאנשים רוצים. קונים לימונים ב-10 ₪, מוכרים לימונדה ב-30 ₪ — נשארו 20 ₪. זה נקרא <b>רווח</b>.</p>
+    <p class="punch">כל חברה ענקית בעולם התחילה כ"דוכן לימונדה" של מישהו.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 3</div>
+    <h2>מניה = פרוסה מהפיצה</h2>
+    <div class="big">🍕</div>
+    <p class="lead">כשחברה רוצה לגדול, היא חותכת את עצמה לפרוסות קטנות ומוכרת אותן. כל פרוסה נקראת <b>מניה</b>, ומי שקונה אותה הופך ל<b>שותף אמיתי</b> — מגיע לו חלק מהרווחים.</p>
+    <p class="punch">כשקונים מניה, לא "שמים כסף" — קונים חתיכה מחברה.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 4</div>
+    <h2>הבורסה: שוק של פרוסות</h2>
+    <div class="big">🏪</div>
+    <p class="lead">הבורסה היא כמו שוק הכרמל — רק שבמקום עגבניות, מוכרים וקונים בו חלקים של חברות. דוכן שכולם רוצים לקנות ממנו? המחיר עולה. דוכן שכולם בורחים ממנו? המחיר יורד.</p>
+    <p class="punch">מחיר מניה = כמה אנשים רוצים אותה עכשיו, מול כמה מוכנים למכור.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 5 · הרעיון הכי חשוב בקורס</div>
+    <h2>ריבית דריבית: כדור השלג</h2>
+    <div class="big">⛄➡️🏔️</div>
+    <p class="lead">כדור שלג קטן שמתגלגל במורד ההר אוסף עוד שלג בכל סיבוב — וככל שהוא גדל, הוא אוסף <b>מהר יותר</b>. ככה כסף מושקע: הרווחים מתחילים להרוויח בעצמם.</p>
+    <p class="punch">חידה: מה עדיף — מיליון ₪ היום, או אגורה שמכפילה את עצמה כל יום במשך חודש? (האגורה! יותר מ-5 מיליון ₪)</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 5 · בואו נראה את זה</div>
+    <div class="figure">
+      <div class="ttl">500 ₪ בחודש, במשך 25 שנה</div>
+      <div class="sub">תשואה שנתית ממוצעת של 7% להמחשה — כך נראה כדור השלג במספרים</div>
+      <svg id="chart" role="img" aria-label="גרף: שווי התיק מול סך ההפקדות לאורך 25 שנה"></svg>
+      <div class="legend">
+        <span>שווי התיק<i id="lg1"></i></span>
+        <span>מה שהפקדנו בפועל<i id="lg2"></i></span>
+      </div>
+    </div>
+    <p class="punch" id="chartPunch">הפקדנו 150,000 ₪ — הכדור גלגל אותם לכ-393,000 ₪.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 6</div>
+    <h2>סל פירות: למה לא לשים הכל על תות אחד</h2>
+    <div class="big">🧺🍓🍌🍎🍇</div>
+    <p class="lead">סוחר שקנה רק תותים הפסיד הכל כשהם נרקבו. סוחרת עם סל של 10 פירות? חלק נרקבו — ורוב הסל נשאר מצוין. זה נקרא <b>פיזור</b>.</p>
+    <p class="punch">קרן מדד (כמו S&P 500) = סל עם 500 החברות הגדולות. קנייה אחת — ואתם שותפים בכולן.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">שיעור 7</div>
+    <h2>הנדנדה: סיכון מול זמן</h2>
+    <div class="big">⚖️</div>
+    <div class="cards">
+      <div class="card"><div class="ic">🐢</div><b>השביל הישר</b><span>חיסכון בבנק: איטי, בטוח, כמעט לא מטפס. מתאים לכסף שצריך בקרוב.</span></div>
+      <div class="card"><div class="ic">🎢</div><b>השביל המפותל</b><span>מניות: עולה ויורד בפראות בדרך — אבל לאורך שנים רבות היסטורית הגיע הרבה יותר גבוה.</span></div>
+    </div>
+    <p class="punch">מי שיש לו זמן, הטלטלות לא מפחידות אותו. ירידה = מבצע למי שקונה כל חודש.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">התוכנית שלנו · חלק א׳</div>
+    <h2>הטווח הארוך: הוראת קבע ולשכוח</h2>
+    <div class="tblwrap"><table>
+      <tr><th>מה</th><th>איך</th></tr>
+      <tr><td><b>מה קונים</b></td><td>קרן מחקה מדד רחב — S&P 500 או מדד עולמי</td></tr>
+      <tr><td><b>כמה</b></td><td class="num">300–500 ₪ בהוראת קבע חודשית</td></tr>
+      <tr><td><b>איפה</b></td><td>קופת גמל להשקעה במסלול מחקה מדד, או חשבון מסחר עצמאי</td></tr>
+      <tr><td><b>מתי מוכרים</b></td><td>עוד המון שנים. לא נוגעים, במיוחד לא בירידות</td></tr>
+      <tr><td><b>מה בודקים</b></td><td>פעם בחודש, 10 דקות, יחד עם הילד</td></tr>
+    </table></div>
+    <p class="lead">הסוד: לא גאונות — <b>עקביות</b>. מיצוע חודשי הופך כל ירידה בשוק להזדמנות קנייה.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">התוכנית שלנו · חלק ב׳</div>
+    <h2>ניסוי ה-1,000 ₪: סיכון גבוה, בעיניים פקוחות</h2>
+    <div class="tblwrap"><table>
+      <tr><th>אפשרות</th><th>הסיכוי</th><th>הסיכון</th></tr>
+      <tr><td><b>מניה בודדת</b> שמבינים</td><td class="good">עשרות אחוזים בשנה טובה</td><td class="warn">נפילה של 50%+ על דוח רע</td></tr>
+      <tr><td><b>קרן ממונפת פי 3</b> על מדד</td><td class="good">רווח מוכפל בשוק עולה</td><td class="warn">מפולת + שחיקת מינוף</td></tr>
+      <tr><td><b>ביטקוין</b> (גוף מפוקח)</td><td class="good">שנים של מאות אחוזים</td><td class="warn">צניחות של 70%–80%</td></tr>
+    </table></div>
+    <p class="punch">חוק הברזל: זה כסף שמותר לו להימחק. תזה כתובה לפני קנייה, נקודת יציאה מראש, ובלי "להשלים" אחרי הפסד.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">לזכור לתמיד</div>
+    <h2>חמשת כללי הזהב</h2>
+    <div class="cards">
+      <div class="card"><div class="ic">1️⃣</div><b>משקיעים רק כסף שלא צריך בקרוב</b><span>קרן חירום קודמת לכל השקעה.</span></div>
+      <div class="card"><div class="ic">2️⃣</div><b>זמן מנצח תזמון</b><span>לא מנחשים מתי לקנות — קונים כל חודש.</span></div>
+      <div class="card"><div class="ic">3️⃣</div><b>פיזור מנצח ניחוש</b><span>סל שלם, לא תות אחד.</span></div>
+      <div class="card"><div class="ic">4️⃣</div><b>כשיורד — לא בורחים</b><span>ירידות הן חלק מהדרך, לא תקלה בה.</span></div>
+      <div class="card"><div class="ic">5️⃣</div><b>לא מבינים? לא קונים</b><span>וכל מי שמבטיח תשואה — נורת אזהרה.</span></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="big">🎓</div>
+    <h2>מתחילים השבוע</h2>
+    <p class="lead">1) צנצנת עם שלושה תאים לילד &nbsp;·&nbsp; 2) הוראת קבע ראשונה לקרן מדד &nbsp;·&nbsp; 3) מפגש ראשון של הקורס (30 דקות, סיפור אחד, משחק אחד)</p>
+    <p class="lead" style="font-size:13px">החומר הזה הוא לימודי בלבד ואינו ייעוץ השקעות אישי. תשואות העבר אינן מבטיחות דבר לגבי העתיד.</p>
+  </section>
+
+</div>
+
+<div class="bar">
+  <span class="nm">בית הספר הקטן לשוק ההון</span>
+  <div class="dots" id="dots"></div>
+  <div class="btns">
+    <span class="hint">מקשי החצים או רווח לדפדוף</span>
+    <button id="prev">→ הקודם</button>
+    <span class="cnt" id="cnt"></span>
+    <button class="primary" id="next">הבא ←</button>
+  </div>
+</div>
+</div>
+<div class="tip" id="tip"></div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0;
+  var dots=document.getElementById('dots'),cnt=document.getElementById('cnt');
+  slides.forEach(function(_,k){
+    var d=document.createElement('i'); d.tabIndex=0; d.setAttribute('role','button');
+    d.setAttribute('aria-label','שקף '+(k+1));
+    d.addEventListener('click',function(){go(k)});
+    d.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')go(k)});
+    dots.appendChild(d);
+  });
+  function go(k){
+    i=Math.max(0,Math.min(slides.length-1,k));
+    slides.forEach(function(s,j){s.classList.toggle('on',j===i)});
+    [].slice.call(dots.children).forEach(function(d,j){d.classList.toggle('on',j===i)});
+    cnt.textContent=(i+1)+' / '+slides.length;
+    if(slides[i].querySelector('#chart')) drawChart();
+  }
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    if(e.key==='ArrowRight'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+  });
+
+  /* --- compound interest chart --- */
+  var svg=document.getElementById('chart'),tip=document.getElementById('tip');
+  var data=[],dep=[],monthly=500,r=0.07/12,years=25;
+  var v=0,d=0;
+  for(var m=0;m<=years*12;m++){
+    if(m>0){v=v*(1+r)+monthly; d+=monthly;}
+    if(m%12===0){data.push(v);dep.push(d);}
+  }
+  function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+  function fmt(x){return Math.round(x).toLocaleString('he-IL')+' ₪'}
+  function drawChart(){
+    var W=svg.clientWidth||760,H=svg.clientHeight||340,P={t:14,r:16,b:26,l:64};
+    var c1=css('--c1'),c2=css('--c2'),lineC=css('--line'),mut=css('--muted');
+    document.getElementById('lg1').style.background=c1;
+    document.getElementById('lg2').style.background=c2;
+    var maxV=Math.max.apply(null,data)*1.05;
+    function X(yr){return P.l+(W-P.l-P.r)*yr/years}
+    function Y(val){return P.t+(H-P.t-P.b)*(1-val/maxV)}
+    var s='';
+    for(var g=0;g<=4;g++){
+      var gv=maxV*g/4,gy=Y(gv);
+      s+='<line x1="'+P.l+'" y1="'+gy+'" x2="'+(W-P.r)+'" y2="'+gy+'" stroke="'+lineC+'" stroke-width="1"/>';
+      s+='<text x="'+(P.l-8)+'" y="'+(gy+4)+'" text-anchor="end" font-size="11" fill="'+mut+'">'+Math.round(gv/1000)+'K</text>';
+    }
+    for(var yr=0;yr<=years;yr+=5){
+      s+='<text x="'+X(yr)+'" y="'+(H-6)+'" text-anchor="middle" font-size="11" fill="'+mut+'">'+yr+'</text>';
+    }
+    function path(arr){return arr.map(function(val,k){return (k?'L':'M')+X(k)+','+Y(val)}).join(' ')}
+    s+='<path d="'+path(data)+' L'+X(years)+','+Y(0)+' L'+X(0)+','+Y(0)+' Z" fill="'+c1+'" opacity="0.12"/>';
+    s+='<path d="'+path(dep)+'" fill="none" stroke="'+c2+'" stroke-width="2" stroke-linecap="round"/>';
+    s+='<path d="'+path(data)+'" fill="none" stroke="'+c1+'" stroke-width="2.5" stroke-linecap="round"/>';
+    s+='<circle cx="'+X(years)+'" cy="'+Y(data[years])+'" r="4.5" fill="'+c1+'"/>';
+    s+='<circle cx="'+X(years)+'" cy="'+Y(dep[years])+'" r="4.5" fill="'+c2+'"/>';
+    s+='<line id="xh" x1="0" y1="'+P.t+'" x2="0" y2="'+(H-P.b)+'" stroke="'+mut+'" stroke-width="1" stroke-dasharray="3 3" style="display:none"/>';
+    svg.setAttribute('viewBox','0 0 '+W+' '+H);
+    svg.innerHTML=s;
+    svg.onmousemove=function(e){
+      var rct=svg.getBoundingClientRect();
+      var yr=Math.round((e.clientX-rct.left-P.l)/((W-P.l-P.r)/years));
+      if(yr<0||yr>years){tip.style.display='none';svg.querySelector('#xh').style.display='none';return}
+      var xh=svg.querySelector('#xh');xh.style.display='';xh.setAttribute('x1',X(yr));xh.setAttribute('x2',X(yr));
+      tip.style.display='block';
+      tip.innerHTML='<b>שנה '+yr+'</b><br>שווי התיק: '+fmt(data[yr])+'<br>הפקדות: '+fmt(dep[yr]);
+      tip.style.left=Math.min(e.clientX+14,innerWidth-190)+'px';
+      tip.style.top=(e.clientY-14)+'px';
+    };
+    svg.onmouseleave=function(){tip.style.display='none';var xh=svg.querySelector('#xh');if(xh)xh.style.display='none'};
+    document.getElementById('chartPunch').textContent='הפקדנו '+fmt(dep[years])+' — הכדור גלגל אותם ל-'+fmt(data[years])+'.';
+  }
+  addEventListener('resize',function(){if(slides[i].querySelector('#chart'))drawChart()});
+  go(0);
+})();
+</script>
