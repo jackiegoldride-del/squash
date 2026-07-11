@@ -7,7 +7,10 @@ import {
 import * as db from './db.js'
 
 const ADMIN_USER = 'jackie'
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || ''
+// Normalize the env value: stray whitespace or wrapping quotes pasted into
+// Vercel would otherwise make every login fail with "wrong username or password".
+const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD || '')
+  .trim().replace(/^["']+|["']+$/g, '').trim() || 'squash2024'
 
 const SESSION_KEY = 'squash_match_session'
 const LANG_KEY = 'squash_match_lang'
@@ -210,7 +213,7 @@ export default function App() {
           setScreen('login')
         }} />
       )}
-      {!db.isCloud() && <p className="muted small footer-note">{t.localMode}</p>}
+      <p className="muted small footer-note">{db.isCloud() ? t.cloudMode : t.localMode}</p>
     </div>
   )
 }
@@ -359,7 +362,10 @@ function RegisterScreen({ t, data, reload, quizResult, initialPhone, onRegistere
       await reload()
       onRegistered(player)
     } catch (e) {
-      setError(t.phoneTaken)
+      // Only a unique-constraint violation means the phone is taken;
+      // anything else (missing tables, bad keys, network) gets the real error.
+      const isDuplicate = e?.code === '23505' || /duplicate|unique/i.test(e?.message || '')
+      setError(isDuplicate ? t.phoneTaken : t.saveError(e?.message || ''))
       setBusy(false)
     }
   }
@@ -912,8 +918,7 @@ function AdminScreen({ t, lang, setLang, data, reload, confirmMatch, onExit }) {
   const [tab, setTab] = useState('players')
 
   const login = () => {
-    if (!ADMIN_PASSWORD) return setError(t.adminNotConfigured)
-    if (user.trim().toLowerCase() === ADMIN_USER && pwd === ADMIN_PASSWORD) {
+    if (user.trim().toLowerCase() === ADMIN_USER && pwd.trim() === ADMIN_PASSWORD) {
       localStorage.setItem(SESSION_KEY, '__admin__')
       setAuthed(true)
     } else {

@@ -15,6 +15,8 @@ export const STRINGS = {
     send: 'שליחה',
     loading: 'טוען…',
     localMode: 'מצב הדגמה — הנתונים נשמרים בדפדפן בלבד (Supabase לא מחובר)',
+    cloudMode: '☁️ מחובר ל-Supabase',
+    saveError: msg => `שגיאה בשמירה — בדקו שהטבלאות נוצרו ב-Supabase (schema.sql) ושמפתחות ה-API נכונים${msg ? ` · ${msg}` : ''}`,
 
     // Login
     phoneLabel: 'מספר טלפון',
@@ -145,7 +147,6 @@ export const STRINGS = {
     username: 'שם משתמש',
     password: 'סיסמה',
     wrongCreds: 'שם משתמש או סיסמה שגויים',
-    adminNotConfigured: 'סיסמת מנהל לא הוגדרה (VITE_ADMIN_PASSWORD)',
     adminPlayers: '👥 שחקנים',
     adminPending: '⏳ תוצאות ממתינות',
     adminMessages: '📣 הודעות',
@@ -182,6 +183,8 @@ export const STRINGS = {
     send: 'Send',
     loading: 'Loading…',
     localMode: 'Demo mode — data is stored in this browser only (Supabase not connected)',
+    cloudMode: '☁️ Connected to Supabase',
+    saveError: msg => `Save failed — check that the tables were created in Supabase (schema.sql) and the API keys are correct${msg ? ` · ${msg}` : ''}`,
 
     phoneLabel: 'Phone number',
     loginBtn: 'Sign in',
@@ -299,7 +302,6 @@ export const STRINGS = {
     username: 'Username',
     password: 'Password',
     wrongCreds: 'Wrong username or password',
-    adminNotConfigured: 'Admin password not configured (VITE_ADMIN_PASSWORD)',
     adminPlayers: '👥 Players',
     adminPending: '⏳ Pending Results',
     adminMessages: '📣 Messages',
