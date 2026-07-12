@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match & More · בקרוב</title>
+<meta name="description" content="Match & More מבית Jackie Goldride — משהו חדש נפתח. 50 מקומות מייסדים בלבד.">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-card: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.09);
+    --cyan: #22d3ee;
+    --purple: #a855f7;
+    --text: #e8ecf4;
+    --text-dim: #8b93a7;
+    --gradient: linear-gradient(90deg, var(--cyan), var(--purple));
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Heebo", "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+  .glow {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.22;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-cyan { width: 480px; height: 480px; background: var(--cyan); top: -140px; right: -120px; }
+  .glow-purple { width: 520px; height: 520px; background: var(--purple); bottom: -180px; left: -140px; }
+
+  main {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 640px;
+    padding: 48px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 36px;
+  }
+  .badge .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.5); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 7px rgba(34, 211, 238, 0); }
+  }
+
+  .brand {
+    font-size: clamp(40px, 9vw, 64px);
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    direction: ltr;
+    line-height: 1.1;
+  }
+  .byline {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--text-dim);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    direction: ltr;
+  }
+
+  h1 {
+    margin-top: 44px;
+    font-size: clamp(26px, 6vw, 38px);
+    font-weight: 800;
+    line-height: 1.35;
+  }
+  h1 .highlight {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .sub {
+    margin-top: 18px;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 480px;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 40px;
+    width: 100%;
+  }
+  .card {
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px 14px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .card .icon { font-size: 24px; display: block; margin-bottom: 10px; }
+  @media (max-width: 520px) {
+    .cards { grid-template-columns: 1fr; }
+    .card { display: flex; align-items: center; gap: 14px; text-align: right; padding: 16px 18px; }
+    .card .icon { margin-bottom: 0; }
+  }
+
+  form {
+    margin-top: 44px;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 15px 18px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input::placeholder { color: var(--text-dim); }
+  input:focus { border-color: var(--cyan); }
+  button {
+    background: var(--gradient);
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 800;
+    font-family: inherit;
+    color: #06101c;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(34, 211, 238, 0.35); }
+  button:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: none; }
+
+  .scarcity {
+    margin-top: 18px;
+    font-size: 14.5px;
+    color: var(--text-dim);
+  }
+  .scarcity strong { color: var(--cyan); font-weight: 800; }
+
+  .success {
+    display: none;
+    margin-top: 44px;
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    background: rgba(34, 211, 238, 0.08);
+    border-radius: 18px;
+    padding: 28px 22px;
+    max-width: 440px;
+    width: 100%;
+    line-height: 1.7;
+  }
+  .success .big { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    padding: 28px 24px 36px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    text-align: center;
+    line-height: 2;
+  }
+  footer a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="glow glow-cyan"></div>
+  <div class="glow glow-purple"></div>
+
+  <main>
+    <div class="badge"><span class="dot"></span> בקרוב · ההרשמה המוקדמת פתוחה</div>
+
+    <div class="brand">MATCH &amp; MORE</div>
+    <div class="byline">by Jackie Goldride</div>
+
+    <h1>משהו חדש נפתח.<br>ורק <span class="highlight">50 הראשונים</span> נכנסים לפני כולם.</h1>
+
+    <p class="sub">
+      על המגרש — ומחוץ לו.
+      סקווש, יזמות, וכסף שעובד בשבילך.
+      מי שברשימה מקבל הכל קודם. מי שלא — יקרא על זה בפיד.
+    </p>
+
+    <div class="cards">
+      <div class="card"><span class="icon">🔒</span>תוכן שלא יעלה לפיד — רק לרשומים</div>
+      <div class="card"><span class="icon">⚡</span>הטבות מייסדים על כל מה שיושק</div>
+      <div class="card"><span class="icon">🎾</span>גישה מוקדמת לפעילויות ולחדשות</div>
+    </div>
+
+    <form id="waitlist-form">
+      <input type="text" id="name" placeholder="שם" required autocomplete="name">
+      <input type="email" id="email" placeholder="אימייל" required autocomplete="email" dir="ltr" style="text-align: right;">
+      <button type="submit" id="submit-btn">שריינו לי מקום ←</button>
+    </form>
+    <p class="scarcity"><strong>50 מקומות מייסדים</strong> · ההרשמה המוקדמת נסגרת כשהם נגמרים</p>
+
+    <div class="success" id="success">
+      <div class="big">את/ה בפנים 🎉</div>
+      המקום שלך שמור. כשהשערים ייפתחו — תדעו על זה ראשונים.
+      בינתיים, שווה לעקוב באינסטגרם כדי לא לפספס כלום.
+    </div>
+  </main>
+
+  <footer>
+    Match &amp; More · Jackie Goldride ©
+    <br>
+    <a href="#" id="app-link">SQUASH MATCH — האפליקציה למציאת שותפים למשחק</a>
+  </footer>
+
+<script>
+  // === הגדרות ===
+  // כדי לשמור נרשמים ב-Supabase: מלאי את שני הערכים (ראי README).
+  // כל עוד הם ריקים, הטופס יפתח מייל מוכן לשליחה אל FALLBACK_EMAIL.
+  const SUPABASE_URL = "";
+  const SUPABASE_ANON_KEY = "";
+  const FALLBACK_EMAIL = "jackiegoldride@gmail.com";
+  const APP_URL = ""; // הלינק ל-SQUASH MATCH — יופיע בפוטר
+
+  if (APP_URL) document.getElementById("app-link").href = APP_URL;
+
+  const form = document.getElementById("waitlist-form");
+  const btn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    btn.disabled = true;
+    btn.textContent = "רגע…";
+
+    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+      try {
+        const res = await fetch(SUPABASE_URL + "/rest/v1/waitlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ name, email }),
+        });
+        if (!res.ok && res.status !== 409) throw new Error("HTTP " + res.status);
+        showSuccess();
+        return;
+      } catch (err) {
+        // אם Supabase נכשל — נופלים למייל כדי לא לאבד נרשמים
+      }
+    }
+
+    const subject = encodeURIComponent("הרשמה ל-Match & More");
+    const body = encodeURIComponent("היי ג'קי, שמרי לי מקום!\n\nשם: " + name + "\nאימייל: " + email);
+    window.location.href = "mailto:" + FALLBACK_EMAIL + "?subject=" + subject + "&body=" + body;
+    showSuccess();
+  });
+
+  function showSuccess() {
+    form.style.display = "none";
+    document.querySelector(".scarcity").style.display = "none";
+    document.getElementById("success").style.display = "block";
+  }
+</script>
+</body>
+</html>
