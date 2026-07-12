@@ -1,0 +1,498 @@
+<title>Markets II — The Advanced Playbook</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --accent-ink:#0B6B4A; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9;
+    --c1:#0E8A5F; --c2:#B27C1E; --c3:#2B6CB0; --c4:#E2604C;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+      --accent:#3ECF8E; --accent-ink:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+      --line:#2A4238; --chip:#1F3A2F;
+      --c1:#1D9D68; --c2:#B08327; --c3:#4E86C9; --c4:#D25A45;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10201B; --card:#182B24; --ink:#E9F3ED; --muted:#9DBBAC;
+    --accent:#3ECF8E; --accent-ink:#3ECF8E; --gold:#E0B25C; --coral:#F08A76; --blue:#7FB5F0;
+    --line:#2A4238; --chip:#1F3A2F;
+    --c1:#1D9D68; --c2:#B08327; --c3:#4E86C9; --c4:#D25A45;
+  }
+  :root[data-theme="light"]{
+    --bg:#F4F9F6; --card:#FFFFFF; --ink:#17332B; --muted:#4C6B60;
+    --accent:#0E8A5F; --accent-ink:#0B6B4A; --gold:#B27C1E; --coral:#C94A36; --blue:#2B6CB0;
+    --line:#D7E6DD; --chip:#E4F1E9;
+    --c1:#0E8A5F; --c2:#B27C1E; --c3:#2B6CB0; --c4:#E2604C;
+  }
+  *{box-sizing:border-box; margin:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+    overflow:hidden; height:100vh;
+  }
+  .deck{height:100vh; display:flex; flex-direction:column}
+  .stage{flex:1; position:relative; overflow:hidden}
+  .slide{
+    position:absolute; inset:0; display:none; flex-direction:column;
+    justify-content:center; align-items:center; text-align:center;
+    padding:4vh 7vw; gap:2vh;
+  }
+  .slide.on{display:flex; animation:enter .4s ease}
+  @keyframes enter{from{opacity:0; transform:translateY(12px)} to{opacity:1; transform:none}}
+  @media (prefers-reduced-motion: reduce){ .slide.on{animation:none} }
+
+  .eyebrow{
+    font-size:clamp(11px,1.5vh,14px); font-weight:700; color:var(--accent-ink);
+    background:var(--chip); border-radius:999px; padding:.45em 1.2em;
+    letter-spacing:.08em; text-transform:uppercase;
+  }
+  .eyebrow.vid{color:var(--coral); background:transparent; border:1px solid var(--coral)}
+  h1{font-size:clamp(30px,6.5vh,58px); font-weight:900; line-height:1.12; text-wrap:balance; max-width:24ch}
+  h2{font-size:clamp(22px,4.6vh,40px); font-weight:900; line-height:1.18; text-wrap:balance; max-width:28ch}
+  p.lead{font-size:clamp(14px,2.3vh,19px); color:var(--muted); max-width:64ch; line-height:1.65}
+  p.lead b{color:var(--ink)}
+  .punch{
+    font-size:clamp(15px,2.6vh,22px); font-weight:800; color:var(--accent-ink);
+    border-block:3px solid var(--accent); padding:.55em 0; max-width:52ch; line-height:1.5;
+  }
+  .cards{display:flex; gap:1.4vh; flex-wrap:wrap; justify-content:center; max-width:1080px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:1.9vh 2.1vh; width:min(300px,84vw); text-align:left;
+    display:flex; flex-direction:column; gap:.6vh;
+  }
+  .card b{font-size:clamp(14px,2.1vh,17px)}
+  .card .tag{font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-ink)}
+  .card span{font-size:clamp(12.5px,1.85vh,15px); color:var(--muted); line-height:1.55}
+  .card span b{color:var(--ink)}
+  .tblwrap{max-width:94vw; overflow-x:auto; border:1px solid var(--line); border-radius:14px}
+  table{border-collapse:collapse; background:var(--card); font-size:clamp(12.5px,1.9vh,16px); min-width:560px}
+  th,td{padding:.65em 1.05em; border-bottom:1px solid var(--line); text-align:left}
+  th{background:var(--chip); font-weight:800}
+  tr:last-child td{border-bottom:none}
+  td.num{font-variant-numeric:tabular-nums}
+  .neg{color:var(--coral); font-weight:700}
+  .pos{color:var(--accent-ink); font-weight:700}
+
+  /* in-deck video segments */
+  .player{
+    position:relative; background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:1.8vh 2vh 1.2vh; width:min(880px,94vw);
+  }
+  .player .ttl{font-weight:800; font-size:clamp(14px,2.2vh,18px); text-align:left}
+  .player .sub{color:var(--muted); font-size:clamp(11.5px,1.7vh,14px); text-align:left; margin-top:.15em}
+  .player canvas{width:100%; height:36vh; display:block; margin-top:1vh; border-radius:8px}
+  .player .overlay{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:transparent; border:0; cursor:pointer; border-radius:16px;
+  }
+  .player .overlay span{
+    background:var(--accent); color:#fff; font:inherit; font-weight:900;
+    font-size:clamp(15px,2.4vh,20px); padding:.65em 1.5em; border-radius:999px;
+    box-shadow:0 6px 24px rgba(0,0,0,.25);
+  }
+  .player .cap{
+    min-height:2.6em; display:flex; align-items:center; justify-content:center; text-align:center;
+    font-weight:700; font-size:clamp(12.5px,2vh,16px); color:var(--ink); padding:.4em 1em 0;
+  }
+  .legend{display:flex; gap:1.5em; font-size:clamp(11.5px,1.7vh,14px); color:var(--muted); padding-top:.3em; justify-content:center}
+  .legend i{display:inline-block; width:14px; height:4px; border-radius:2px; vertical-align:middle; margin-right:.45em}
+
+  .bar{
+    display:flex; align-items:center; justify-content:space-between; gap:1em;
+    padding:1.1vh 2.4vw; border-top:1px solid var(--line); background:var(--card);
+  }
+  .bar .nm{font-weight:800; font-size:13px; color:var(--muted)}
+  .dots{display:flex; gap:6px; flex-wrap:wrap; justify-content:center}
+  .dots i{width:9px; height:9px; border-radius:50%; background:var(--line); cursor:pointer; transition:.2s}
+  .dots i.on{background:var(--accent); transform:scale(1.25)}
+  .btns{display:flex; gap:.5em; align-items:center}
+  button{
+    font:inherit; font-weight:800; cursor:pointer; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); border-radius:10px; padding:.5em 1em;
+  }
+  button.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+  button:focus-visible,.dots i:focus-visible,.overlay:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+  .cnt{font-variant-numeric:tabular-nums; color:var(--muted); font-size:13px; min-width:4.5em; text-align:center}
+  .hint{font-size:12px; color:var(--muted)}
+  @media (max-width:640px){ .hint{display:none} }
+  ul.tight{max-width:66ch; text-align:left; color:var(--muted); line-height:1.7; font-size:clamp(13px,2vh,16.5px); padding-left:1.2em}
+  ul.tight b{color:var(--ink)}
+</style>
+
+<div class="deck">
+<div class="stage" id="stage">
+
+  <section class="slide on">
+    <div class="eyebrow">Level 2 · For the investor who knows the basics</div>
+    <h1>Markets II — The Advanced Playbook</h1>
+    <p class="lead">Valuation, interest rates, index mechanics, leverage decay, behavioral traps and portfolio construction — with three live simulations inside the deck. Prerequisite: the beginner course (what a stock, an index and compounding are).</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">01 · Valuation</div>
+    <h2>Price is what you pay. Value is what you get.</h2>
+    <div class="cards">
+      <div class="card"><span class="tag">The core ratio</span><b>P/E — price to earnings</b><span>A stock at $100 earning $5 per share trades at <b>P/E 20</b>: you pay 20 years of today's profit. Flip it: 5/100 = a <b>5% earnings yield</b> — compare that to what bonds pay.</span></div>
+      <div class="card"><span class="tag">The catch</span><b>Growth is already in the price</b><span>A high P/E isn't "expensive" and a low one isn't "cheap" — it's the market's forecast. Nvidia at P/E 60 means the crowd expects earnings to multiply. The question is never "is it good?" but <b>"is it better than what's priced in?"</b></span></div>
+      <div class="card"><span class="tag">The consequence</span><b>Great company ≠ great stock</b><span>Cisco was a phenomenal business in 2000. Buyers at the peak waited <b>~20 years</b> to break even — the price already assumed perfection.</span></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">02 · Financial statements</div>
+    <h2>Three documents tell the whole story</h2>
+    <div class="cards">
+      <div class="card"><span class="tag">The movie</span><b>Income statement</b><span>Revenue → costs → <b>net income</b>, over a quarter or year. Watch the <b>margin</b> (profit ÷ revenue): a rising margin means pricing power.</span></div>
+      <div class="card"><span class="tag">The snapshot</span><b>Balance sheet</b><span>What the company <b>owns vs owes</b> right now. Heavy debt isn't fatal — until interest rates rise. Cash-rich companies survive winters.</span></div>
+      <div class="card"><span class="tag">The lie detector</span><b>Cash flow statement</b><span>Accounting profit can be massaged; <b>cash entering the bank cannot</b>. Profitable on paper + burning cash = red flag. Free cash flow is the number pros trust.</span></div>
+    </div>
+    <p class="punch">First habit of serious investors: read the cash flow statement before the press release.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow vid">▶ Video segment 1</div>
+    <div class="player" id="pl1">
+      <div class="ttl">The compounding machine — where the money actually comes from</div>
+      <div class="sub">500/mo at 7%/yr for 40 years. Watch the engine flip: early on your deposits do the work; later, returns dwarf them.</div>
+      <canvas></canvas>
+      <div class="cap"></div>
+      <div class="legend"><span><i style="background:var(--c2)"></i>Your deposits</span><span><i style="background:var(--c1)"></i>Market growth</span></div>
+      <button class="overlay"><span>▶ Play</span></button>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">03 · Interest rates</div>
+    <h2>Rates are gravity for every asset price</h2>
+    <p class="lead">A stock is a claim on <b>future</b> profits — and future money must be discounted to today's value. The discount rate starts from the central-bank rate. When rates rise, tomorrow's shekel is worth less today, so <b>long-duration assets (growth stocks) fall hardest</b>. When rates fall, the same cash flows are suddenly worth more.</p>
+    <div class="tblwrap"><table>
+      <tr><th>Environment</th><th>Bonds pay</th><th>What it does to stocks</th></tr>
+      <tr><td>Zero rates (2010s)</td><td class="num">~0–2%</td><td>No alternative → money floods into equities, valuations stretch</td></tr>
+      <tr><td>Rising rates (2022)</td><td class="num">4–5%</td><td class="neg">"Safe 5%" competes with stocks → P/E compresses, growth −30%+</td></tr>
+      <tr><td>Cutting cycle</td><td class="num">falling</td><td class="pos">Discount rates drop → valuations re-expand</td></tr>
+    </table></div>
+    <p class="punch">You don't need to predict the Fed. You need to not be surprised that rates move markets.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">04 · Index mechanics</div>
+    <h2>Why the index is so hard to beat</h2>
+    <ul class="tight">
+      <li><b>Market-cap weighting:</b> the S&amp;P 500 isn't 500 equal bets — the biggest companies get the biggest weight. Your index money automatically rides the winners as they grow.</li>
+      <li><b>Self-cleansing:</b> failures shrink and drop out; rising stars get added. The index fires losers and hires winners — with zero management fee for the decision.</li>
+      <li><b>Skewness:</b> most stocks are mediocre; a tiny handful (4% historically) create nearly all net wealth. Stock-pickers must find those needles — the index simply owns the whole haystack.</li>
+      <li><b>The evidence:</b> over 15-year windows, roughly <b>9 out of 10</b> professional active funds underperform their benchmark after fees (SPIVA data).</li>
+    </ul>
+    <p class="punch">Beating the index isn't impossible. It's just statistically arrogant to assume you're the exception.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">05 · Diversification math</div>
+    <h2>The only free lunch in finance</h2>
+    <p class="lead">Diversification isn't "owning many things" — it's owning things that <b>don't move together</b> (correlation &lt; 1). Combine imperfectly-correlated assets and portfolio volatility drops <b>below the average</b> of its parts, while expected return stays the average. Less volatility also means less <b>volatility drag</b>: lose 50%, and you need +100% just to get back to zero.</p>
+    <div class="tblwrap"><table>
+      <tr><th>Drop</th><th>Gain needed to recover</th></tr>
+      <tr><td class="num">−10%</td><td class="num">+11%</td></tr>
+      <tr><td class="num">−30%</td><td class="num">+43%</td></tr>
+      <tr><td class="num neg">−50%</td><td class="num neg">+100%</td></tr>
+      <tr><td class="num neg">−80%</td><td class="num neg">+400%</td></tr>
+    </table></div>
+    <p class="punch">Deep losses are asymmetric. The first job of a portfolio is to make −50% impossible.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow vid">▶ Video segment 2</div>
+    <div class="player" id="pl2">
+      <div class="ttl">Leverage decay — why 3× ETFs bleed in sideways markets</div>
+      <div class="sub">Same market, two portfolios: the index vs a 3× daily-leveraged version. Volatility itself eats the leveraged fund.</div>
+      <canvas></canvas>
+      <div class="cap"></div>
+      <div class="legend"><span><i style="background:var(--c3)"></i>Index (1×)</span><span><i style="background:var(--c4)"></i>3× daily leveraged</span></div>
+      <button class="overlay"><span>▶ Play</span></button>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">06 · Behavioral finance</div>
+    <h2>The most expensive organ in investing is the amygdala</h2>
+    <div class="cards">
+      <div class="card"><span class="tag">Loss aversion</span><b>Losses hurt ~2× more than gains feel good</b><span>That asymmetry makes people sell bottoms and avoid buying after crashes — the exact opposite of profitable behavior.</span></div>
+      <div class="card"><span class="tag">The behavior gap</span><b>Investors earn less than their own funds</b><span>Studies (DALBAR, Morningstar) find the average investor underperforms the very funds they hold by <b>~1.5–2%/yr</b> — purely from ill-timed entries and exits.</span></div>
+      <div class="card"><span class="tag">Recency & FOMO</span><b>"This time it keeps going up"</b><span>Whatever rose recently feels safe (it isn't) and whatever crashed feels dangerous (that's often the discount). Momentum of feelings ≠ momentum of value.</span></div>
+    </div>
+    <p class="punch">Write rules when calm; execute them when scared. Never invert that order.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">07 · Portfolio construction</div>
+    <h2>Core–satellite: discipline at the center, curiosity at the edge</h2>
+    <div class="cards">
+      <div class="card"><span class="tag">85–95% · Core</span><b>Broad index funds, automated monthly</b><span>Global or S&amp;P 500 tracker, lowest fees you can find, auto-invested. Boring by design — this is the wealth engine.</span></div>
+      <div class="card"><span class="tag">5–15% · Satellite</span><b>Your active ideas, ring-fenced</b><span>Single stocks, themes, crypto — capped so a total wipeout is survivable. Track its performance honestly against the core. Most people learn the core wins.</span></div>
+      <div class="card"><span class="tag">Deployment</span><b>Lump sum vs DCA</b><span>Statistically a lump sum beats drip-feeding ~<b>2 times out of 3</b> (markets rise more often than not). But if a crash the day after would break you emotionally — spreading over months is the psychologically correct choice.</span></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">08 · Costs & taxes (Israeli investor)</div>
+    <h2>The only two things you fully control</h2>
+    <ul class="tight">
+      <li><b>Capital gains tax: 25%</b> on real (inflation-adjusted) gains, charged when you sell. No sale — no tax event: long holding = free tax deferral, compounding works on the government's share too.</li>
+      <li><b>Irish-domiciled accumulating ETFs</b> reinvest dividends without a taxable distribution and cut US dividend withholding from 30% to 15% — structurally efficient for long-term Israeli holders.</li>
+      <li><b>Management fees compound against you:</b> 0.07% vs 0.8% TER on the same index ≈ hundreds of thousands of shekels over an investing lifetime. Fee comparison is the highest-paid hour of work in finance.</li>
+      <li><b>Tax-advantaged wrappers first:</b> Keren Hishtalmut (tax-free at eligibility) and Kupat Gemel LeHashkaa (annuity route exempt at 60) beat a plain brokerage account for the same index exposure.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow vid">▶ Video segment 3</div>
+    <div class="player" id="pl3">
+      <div class="ttl">Monte Carlo — 150 possible futures of the same plan</div>
+      <div class="sub">Same inputs (500/mo, 30 years, 7% avg with realistic volatility) — but randomness decides the path. Watch the range of outcomes, not a single line.</div>
+      <canvas></canvas>
+      <div class="cap"></div>
+      <button class="overlay"><span>▶ Play</span></button>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">The advanced golden rules</div>
+    <h2>What separates pros from tourists</h2>
+    <ul class="tight">
+      <li><b>Think in ranges, not points.</b> Any forecast with one number is marketing; real planning uses the Monte Carlo fan.</li>
+      <li><b>Expected return is paid for enduring drawdowns.</b> If you can't sit through −30%, you don't own stocks — they own you.</li>
+      <li><b>Process over outcome.</b> A good decision can lose money and a reckless one can win. Grade the process; luck evens out, discipline compounds.</li>
+      <li><b>Costs, taxes, behavior — in that order of controllability.</b> Alpha is a maybe; a saved fee is a certainty.</li>
+      <li><b>Position size is risk management.</b> The satellite stays capped no matter how convinced you are. Especially then.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Keep going</div>
+    <h2>Further watching & reading</h2>
+    <ul class="tight">
+      <li>🎥 Search: <b>"How The Economic Machine Works — Ray Dalio"</b> (30 min, the macro map)</li>
+      <li>🎥 Search: <b>"Bogleheads philosophy index investing"</b> — the intellectual home of core investing</li>
+      <li>📖 <b>The Psychology of Money</b> — Morgan Housel (behavior; the most important book here)</li>
+      <li>📖 <b>A Random Walk Down Wall Street</b> — Burton Malkiel (why indexing wins)</li>
+      <li>📖 <b>One Up On Wall Street</b> — Peter Lynch (if you must pick stocks, pick what you know)</li>
+    </ul>
+    <p class="lead" style="font-size:12.5px">Educational material only — not personal investment advice. Past returns guarantee nothing.</p>
+  </section>
+
+</div>
+
+<div class="bar">
+  <span class="nm">Markets II · Advanced</span>
+  <div class="dots" id="dots"></div>
+  <div class="btns">
+    <span class="hint">Arrow keys / space to navigate</span>
+    <button id="prev">← Back</button>
+    <span class="cnt" id="cnt"></span>
+    <button class="primary" id="next">Next →</button>
+  </div>
+</div>
+</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0;
+  var dots=document.getElementById('dots'),cnt=document.getElementById('cnt');
+  var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  slides.forEach(function(_,k){
+    var d=document.createElement('i'); d.tabIndex=0; d.setAttribute('role','button');
+    d.setAttribute('aria-label','Slide '+(k+1));
+    d.addEventListener('click',function(){go(k)});
+    d.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' ')go(k)});
+    dots.appendChild(d);
+  });
+  function go(k){
+    stopAll();
+    i=Math.max(0,Math.min(slides.length-1,k));
+    slides.forEach(function(s,j){s.classList.toggle('on',j===i)});
+    [].slice.call(dots.children).forEach(function(d,j){d.classList.toggle('on',j===i)});
+    cnt.textContent=(i+1)+' / '+slides.length;
+  }
+  document.getElementById('next').addEventListener('click',function(){go(i+1)});
+  document.getElementById('prev').addEventListener('click',function(){go(i-1)});
+  document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='BUTTON'&&e.key===' ')return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();go(i+1)}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(i-1)}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+  });
+
+  function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+  function fmt(x){return Math.round(x).toLocaleString('en-US')}
+
+  /* seeded RNG so every viewing shows the same "random" market */
+  function rng(seed){return function(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}}
+  function gauss(r){var a=r()||1e-9,b=r();return Math.sqrt(-2*Math.log(a))*Math.cos(6.2831853*b)}
+
+  var players={},raf={};
+  function setupPlayer(id,run){
+    var el=document.getElementById(id);
+    var cv=el.querySelector('canvas'),ov=el.querySelector('.overlay'),cap=el.querySelector('.cap');
+    players[id]={el:el,cv:cv,ov:ov,cap:cap,run:run,playing:false};
+    ov.addEventListener('click',function(){
+      ov.style.display='none'; players[id].playing=true;
+      run(players[id], reduced);
+    });
+  }
+  function stopAll(){
+    Object.keys(players).forEach(function(id){
+      if(raf[id])cancelAnimationFrame(raf[id]);
+      players[id].playing=false;
+      players[id].ov.style.display='flex';
+      players[id].ov.querySelector('span').textContent='▶ Replay';
+    });
+  }
+  function prep(p){
+    var d=window.devicePixelRatio||1,W=p.cv.clientWidth,H=p.cv.clientHeight;
+    p.cv.width=W*d; p.cv.height=H*d;
+    var ctx=p.cv.getContext('2d'); ctx.setTransform(d,0,0,d,0,0);
+    return {ctx:ctx,W:W,H:H};
+  }
+  function grid(ctx,W,H,P,maxV,fmtY){
+    ctx.strokeStyle=css('--line'); ctx.fillStyle=css('--muted');
+    ctx.font='11px system-ui'; ctx.lineWidth=1; ctx.textAlign='right';
+    for(var g=0;g<=4;g++){
+      var v=maxV*g/4,y=P.t+(H-P.t-P.b)*(1-g/4);
+      ctx.beginPath(); ctx.moveTo(P.l,y); ctx.lineTo(W-P.r,y); ctx.stroke();
+      ctx.fillText(fmtY(v),P.l-6,y+4);
+    }
+  }
+
+  /* ---- V1: compounding machine (stacked deposits vs growth) ---- */
+  setupPlayer('pl1',function(p,instant){
+    var g=prep(p),ctx=g.ctx,W=g.W,H=g.H,P={t:12,r:14,b:22,l:56};
+    var years=40,mo=500,r=0.07/12,dep=[0],tot=[0],d=0,v=0;
+    for(var m=1;m<=years*12;m++){v=v*(1+r)+mo;d+=mo;if(m%12===0){dep.push(d);tot.push(v)}}
+    var maxV=tot[years]*1.04,dur=14000,t0=null;
+    function X(yr){return P.l+(W-P.l-P.r)*yr/years}
+    function Y(val){return P.t+(H-P.t-P.b)*(1-val/maxV)}
+    function frame(ts){
+      if(!p.playing)return;
+      if(!t0)t0=ts;
+      var f=instant?1:Math.min(1,(ts-t0)/dur),yr=f*years;
+      ctx.clearRect(0,0,W,H);
+      grid(ctx,W,H,P,maxV,function(v){return fmt(v/1000)+'K'});
+      var n=Math.max(1,Math.floor(yr)),fr=yr-n<0?0:yr-Math.floor(yr);
+      function at(arr,x){var k=Math.min(arr.length-1,Math.floor(x));var k2=Math.min(arr.length-1,k+1);return arr[k]+(arr[k2]-arr[k])*(x-k)}
+      ctx.beginPath(); ctx.moveTo(X(0),Y(0));
+      for(var q=0;q<=yr;q+=0.25)ctx.lineTo(X(q),Y(at(dep,q)));
+      ctx.lineTo(X(yr),Y(0)); ctx.closePath();
+      ctx.fillStyle=css('--c2'); ctx.globalAlpha=.75; ctx.fill(); ctx.globalAlpha=1;
+      ctx.beginPath(); ctx.moveTo(X(0),Y(0));
+      for(q=0;q<=yr;q+=0.25)ctx.lineTo(X(q),Y(at(dep,q)));
+      for(q=yr;q>=0;q-=0.25)ctx.lineTo(X(q),Y(at(tot,q)));
+      ctx.closePath();
+      ctx.fillStyle=css('--c1'); ctx.globalAlpha=.75; ctx.fill(); ctx.globalAlpha=1;
+      ctx.strokeStyle=css('--c1'); ctx.lineWidth=2.5;
+      ctx.beginPath();
+      for(q=0;q<=yr;q+=0.25){var yy=Y(at(tot,q));q===0?ctx.moveTo(X(q),yy):ctx.lineTo(X(q),yy)}
+      ctx.stroke();
+      var D=at(dep,yr),T=at(tot,yr),G=T-D;
+      var share=T>0?Math.round(100*G/T):0;
+      p.cap.textContent='Year '+Math.floor(yr)+' · deposits '+fmt(D)+' · growth '+fmt(G)+' ('+share+'% of the pot is market growth)';
+      if(f<1){raf['pl1']=requestAnimationFrame(frame)}
+      else{p.cap.textContent='After 40 years: you deposited '+fmt(D)+' — the market added '+fmt(G)+'. '+share+'% of your wealth is compounding, not saving.'}
+    }
+    raf['pl1']=requestAnimationFrame(frame);
+  });
+
+  /* ---- V2: leverage decay ---- */
+  setupPlayer('pl2',function(p,instant){
+    var g=prep(p),ctx=g.ctx,W=g.W,H=g.H,P={t:12,r:14,b:22,l:56};
+    var days=252,r=rng(42),idx=[100],lev=[100];
+    /* draw log-returns, then de-trend so the index ends the year flat —
+       isolating pure volatility so the 3x daily-reset decay is visible */
+    var lr=[],sum=0;
+    for(var d1=0;d1<days;d1++){var x=gauss(r)*0.019;lr.push(x);sum+=x}
+    for(d1=0;d1<days;d1++){
+      var ret=Math.exp(lr[d1]-sum/days)-1;
+      idx.push(idx[d1]*(1+ret));
+      lev.push(Math.max(1,lev[d1]*(1+3*ret)));
+    }
+    var maxV=Math.max.apply(null,idx.concat(lev))*1.06,dur=12000,t0=null;
+    function X(d2){return P.l+(W-P.l-P.r)*d2/days}
+    function Y(val){return P.t+(H-P.t-P.b)*(1-val/maxV)}
+    function line(arr,upto,color){
+      ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.beginPath();
+      for(var k=0;k<=upto;k++){var y=Y(arr[k]);k===0?ctx.moveTo(X(k),y):ctx.lineTo(X(k),y)}
+      ctx.stroke();
+    }
+    function frame(ts){
+      if(!p.playing)return;
+      if(!t0)t0=ts;
+      var f=instant?1:Math.min(1,(ts-t0)/dur),upto=Math.floor(f*days);
+      ctx.clearRect(0,0,W,H);
+      grid(ctx,W,H,P,maxV,function(v){return Math.round(v)});
+      ctx.strokeStyle=css('--muted'); ctx.setLineDash([3,3]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(P.l,Y(100)); ctx.lineTo(W-P.r,Y(100)); ctx.stroke(); ctx.setLineDash([]);
+      line(idx,upto,css('--c3')); line(lev,upto,css('--c4'));
+      var iv=idx[upto],lv=lev[upto];
+      p.cap.textContent='Day '+upto+' · index '+(iv-100>=0?'+':'')+(iv-100).toFixed(1)+'% · 3× fund '+(lv-100>=0?'+':'')+(lv-100).toFixed(1)+'%';
+      if(f<1){raf['pl2']=requestAnimationFrame(frame)}
+      else{p.cap.textContent='A flat, choppy year: index '+(iv-100>=0?'+':'')+(iv-100).toFixed(1)+'% — the 3× fund '+(lv-100).toFixed(1)+'%. Daily reset × volatility = decay: leverage is a trading tool, not a holding.'}
+    }
+    raf['pl2']=requestAnimationFrame(frame);
+  });
+
+  /* ---- V3: Monte Carlo fan ---- */
+  setupPlayer('pl3',function(p,instant){
+    var g=prep(p),ctx=g.ctx,W=g.W,H=g.H,P={t:12,r:14,b:22,l:56};
+    var years=30,months=years*12,mo=500,N=150,r=rng(7);
+    var paths=[],finals=[];
+    for(var n=0;n<N;n++){
+      var v=0,arr=[0];
+      for(var m=1;m<=months;m++){
+        var ret=0.07/12+gauss(r)*0.045;
+        v=Math.max(0,v*(1+ret)+mo);
+        if(m%6===0)arr.push(v);
+      }
+      paths.push(arr); finals.push(v);
+    }
+    var sorted=finals.slice().sort(function(a,b){return a-b});
+    var p10=sorted[Math.floor(N*0.1)],p50=sorted[Math.floor(N*0.5)],p90=sorted[Math.floor(N*0.9)];
+    var maxV=sorted[Math.floor(N*0.93)],steps=paths[0].length-1,dur=11000,t0=null;
+    function X(s){return P.l+(W-P.l-P.r)*s/steps}
+    function Y(val){return P.t+(H-P.t-P.b)*(1-Math.min(val,maxV)/maxV)}
+    function frame(ts){
+      if(!p.playing)return;
+      if(!t0)t0=ts;
+      var f=instant?1:Math.min(1,(ts-t0)/dur),nShow=Math.max(1,Math.floor(f*N));
+      ctx.clearRect(0,0,W,H);
+      grid(ctx,W,H,P,maxV,function(v){return fmt(v/1000)+'K'});
+      for(var n2=0;n2<nShow;n2++){
+        ctx.strokeStyle=css('--c1'); ctx.globalAlpha=.12; ctx.lineWidth=1;
+        ctx.beginPath();
+        for(var s=0;s<=steps;s++){var y=Y(paths[n2][s]);s===0?ctx.moveTo(X(s),y):ctx.lineTo(X(s),y)}
+        ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+      p.cap.textContent='Simulated futures: '+nShow+' / '+N;
+      if(f<1){raf['pl3']=requestAnimationFrame(frame)}
+      else{
+        ctx.font='bold 12px system-ui'; ctx.textAlign='left';
+        [[p90,'90th percentile: '+fmt(p90)],[p50,'Median: '+fmt(p50)],[p10,'10th percentile: '+fmt(p10)]].forEach(function(row){
+          ctx.strokeStyle=css('--ink'); ctx.globalAlpha=.85; ctx.lineWidth=1.5; ctx.setLineDash([5,4]);
+          ctx.beginPath(); ctx.moveTo(P.l,Y(row[0])); ctx.lineTo(W-P.r,Y(row[0])); ctx.stroke(); ctx.setLineDash([]);
+          ctx.fillStyle=css('--ink'); ctx.fillText(row[1],P.l+6,Y(row[0])-4);
+          ctx.globalAlpha=1;
+        });
+        p.cap.textContent='Deposits: '+fmt(mo*months)+' in every run. Outcomes ranged '+fmt(p10)+' to '+fmt(p90)+'+ — same plan, different luck. Plan for the range, not the average.';
+      }
+    }
+    raf['pl3']=requestAnimationFrame(frame);
+  });
+
+  addEventListener('resize',stopAll);
+  go(0);
+})();
+</script>

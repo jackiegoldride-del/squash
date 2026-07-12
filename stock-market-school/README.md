@@ -12,6 +12,8 @@
 | [`video.html`](video.html) | שיעור וידאו מונפש (~4 דקות) עם כתוביות וקריינות קולית | פותחים בדפדפן ולוחצים נגן |
 | [`podcast.md`](podcast.md) | תסריטי פודקאסט מלאים (2 פרקים) + מתווה ל-4 נוספים | להקלטה משפחתית או להקראה |
 | [`podcast.html`](podcast.html) | נגן שמקריא את הפודקאסט בקול, עם שני קולות | פותחים בדפדפן |
+| [`advanced.html`](advanced.html) | **Markets II** — מצגת מתקדמת באנגלית (14 שקפים) עם 3 קטעי וידאו-סימולציה חיים | לרמה הבאה, אחרי הקורס הבסיסי |
+| [`notebooklm-source.txt`](notebooklm-source.txt) + [`notebooklm-instructions.md`](notebooklm-instructions.md) | מסמך מקור והוראות ליצירת פודקאסט אמיתי ב-NotebookLM | ראו ההוראות |
 
 ## סדר מומלץ
 
